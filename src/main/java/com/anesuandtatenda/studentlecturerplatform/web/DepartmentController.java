@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
+@CrossOrigin
 @RestController
 @Api(tags = "Departments")
 @RequestMapping("v1/departments")
@@ -53,7 +54,6 @@ public class DepartmentController {
 
     @PostMapping("")
     @ApiOperation("Create Department")
-
     public Department create(@RequestBody DepartmentRequest request) {
         return departmentService.create(request);
     }

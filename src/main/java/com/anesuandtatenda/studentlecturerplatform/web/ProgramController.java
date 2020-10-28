@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
+@CrossOrigin
 @RestController
 @Api(tags = "Programs")
 @RequestMapping("v1/programs")

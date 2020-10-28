@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
+@CrossOrigin
 @RestController
 @Api(tags = "Facaulty")
 @RequestMapping("v1/facaulty")

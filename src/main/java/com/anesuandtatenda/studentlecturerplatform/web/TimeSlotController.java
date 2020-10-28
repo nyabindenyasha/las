@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
+@CrossOrigin
 @RestController
 @Api(tags = "TimeSlots")
 @RequestMapping("v1/timeSlots")

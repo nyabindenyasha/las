@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @Api(tags = "TimeSlot-Lecturers Controller")
 @RequestMapping("v1/timeslot-lecturer")
