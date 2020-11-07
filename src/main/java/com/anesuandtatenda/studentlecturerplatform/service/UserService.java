@@ -17,7 +17,7 @@ public interface UserService extends BaseService<Account, AccountRequest, Accoun
 
     Account findByFirstName(String firstName);
 
-    void findByUsernameOrFirstname(String username, String firstName);
+    Account findByUsernameOrFirstname(String username, String firstName);
 
     String logout();
 

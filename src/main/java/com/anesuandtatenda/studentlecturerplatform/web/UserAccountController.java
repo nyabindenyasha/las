@@ -1,4 +1,5 @@
 package com.anesuandtatenda.studentlecturerplatform.web;
+import com.anesuandtatenda.studentlecturerplatform.local.ResponseMessage;
 import com.anesuandtatenda.studentlecturerplatform.local.exceptions.InvalidRequestException;
 import com.anesuandtatenda.studentlecturerplatform.model.Account;
 import com.anesuandtatenda.studentlecturerplatform.service.UserService;
@@ -8,6 +9,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -26,55 +29,115 @@ public class UserAccountController {
 
     @GetMapping("")
     @ApiOperation("Get UserAccounts")
-    public Page<Account> getAll(@PageableDefault(sort = "name") Pageable pageable,
+    public ResponseEntity<?> getAll(@PageableDefault(sort = "name") Pageable pageable,
                                 @RequestParam(required = false) String search) {
-        return userAccountService.findAll(pageable, search);
+        try {
+            Page<Account> accounts = userAccountService.findAll(pageable, search);
+            return new ResponseEntity<Page<Account>>(accounts, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/all")
     @ApiOperation("Get All UserAccounts")
-    public Collection<Account> getAll() {
-        return userAccountService.findAll();
+    public ResponseEntity<?> getAll() {
+        try {
+            Collection<Account> accounts = userAccountService.findAll();
+            return new ResponseEntity<Collection<Account>>(accounts, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/{userAccountId}")
     @ApiOperation("Get a UserAccount by Id")
-    public Account getUserAccount(@PathVariable long userAccountId) {
-        return userAccountService.findById(userAccountId);
+    public ResponseEntity<?> getUserAccount(@PathVariable long userAccountId) {
+        try {
+            Account account = userAccountService.findById(userAccountId);
+            return new ResponseEntity<Account>(account, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("/{userAccountId}")
     @ApiOperation("Delete a UserAccount by Id")
-    public void delete(@PathVariable long userAccountId) {
-        userAccountService.delete(userAccountId);
+    public ResponseEntity<?> delete(@PathVariable long userAccountId) {
+         try {
+             userAccountService.delete(userAccountId);
+             return new ResponseEntity<>(new ResponseMessage("success"), HttpStatus.OK);
+         }
+         catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
 
     @PostMapping("")
     @ApiOperation("Create UserAccount")
-    public Account create(@RequestBody AccountRequest request) {
-        return userAccountService.create(request);
+    public ResponseEntity<?> create(@RequestBody AccountRequest request) {
+        try {
+            Account userAccountCreated = userAccountService.create(request);
+            return new ResponseEntity<Account>(userAccountCreated, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/login/{username}/{password}")
     @ApiOperation("Login to the system")
-    public Account login(@PathVariable String username,@PathVariable String password){
-        return userAccountService.login(username,password);
+    public ResponseEntity<?> login(@PathVariable String username,@PathVariable String password){
+        try {
+            Account userLoggedIn = userAccountService.login(username,password);
+            return new ResponseEntity<Account>(userLoggedIn, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/v2/login")
+    @ApiOperation("Login to the system")
+    public ResponseEntity<?> login2(@RequestParam String username,@RequestParam String password){
+        try {
+            Account userLoggedIn = userAccountService.login(username,password);
+            return new ResponseEntity<Account>(userLoggedIn, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping("/{userAccountId}")
     @ApiOperation("Update userAccount")
-    public Account update(@RequestBody Account request, @PathVariable long userAccountId) {
-        if(request.getId() != userAccountId){
-            throw new InvalidRequestException("You can not delete this record as it might be used by another record");
+    public ResponseEntity<?> update(@RequestBody Account request, @PathVariable long userAccountId) {
+        try {
+            if(request.getId() != userAccountId){
+                throw new InvalidRequestException("You can not delete this record as it might be used by another record");
+            }
+            Account userAccountUpdated = userAccountService.update(request);
+            return new ResponseEntity<Account>(userAccountUpdated, HttpStatus.OK);
         }
-        return userAccountService.update(request);
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
 
     @GetMapping("/findByUsernameOrFirstname")
     @ApiOperation("Find By Username or Firstname")
-    public void findByUsernameOrFirstname(@RequestParam(required = false)  String username, @RequestParam(required = false) String firstName){
-        userAccountService.findByUsernameOrFirstname(username, firstName);
+    public ResponseEntity<?> findByUsernameOrFirstname(@RequestParam(required = false)  String username, @RequestParam(required = false) String firstName){
+        try {
+            Account user = userAccountService.findByUsernameOrFirstname(username, firstName);
+            return new ResponseEntity<Account>(user, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 }

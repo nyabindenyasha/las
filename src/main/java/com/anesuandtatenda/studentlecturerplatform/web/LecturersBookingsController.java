@@ -1,19 +1,19 @@
 package com.anesuandtatenda.studentlecturerplatform.web;
 
-import com.anesuandtatenda.studentlecturerplatform.model.Facaulty;
+import com.anesuandtatenda.studentlecturerplatform.local.ResponseMessage;
 import com.anesuandtatenda.studentlecturerplatform.model.LecturersBookings;
-import com.anesuandtatenda.studentlecturerplatform.service.FacaultyService;
 import com.anesuandtatenda.studentlecturerplatform.service.LecturersBookingsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -29,37 +29,76 @@ public class LecturersBookingsController {
 
     @GetMapping("")
     @ApiOperation("Get LecturersBookings")
-    public Page<LecturersBookings> getAll(@PageableDefault(sort = "name") Pageable pageable,
-                                 @RequestParam(required = false) String search) {
-        return lecturersBookingsService.findAll(pageable, search);
+    public ResponseEntity<?> getAll(@PageableDefault(sort = "name") Pageable pageable,
+                                    @RequestParam(required = false) String search) {
+        try {
+            Page<LecturersBookings> lecturersBookings = lecturersBookingsService.findAll(pageable, search);
+            return new ResponseEntity<Page<LecturersBookings>>(lecturersBookings, HttpStatus.OK);
+        }
+          catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/all")
     @ApiOperation("Get All LecturersBookings")
-    public Collection<LecturersBookings> getAll() {
-        return lecturersBookingsService.findAll();
+    public ResponseEntity<?> getAll() {
+         try {
+             Collection<LecturersBookings> lecturersBookings = lecturersBookingsService.findAll();
+             return new ResponseEntity<Collection<LecturersBookings>>(lecturersBookings, HttpStatus.OK);
+         }
+          catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("")
     @ApiOperation("Create LecturersBooking")
-    public LecturersBookings create(@RequestBody LecturersBookings request) {
-        return lecturersBookingsService.create(request);
+    public ResponseEntity<?> create(@RequestBody LecturersBookings request) {
+         try {
+             LecturersBookings lecturersBookingCreated = lecturersBookingsService.create(request);
+             return new ResponseEntity<LecturersBookings>(lecturersBookingCreated, HttpStatus.OK);
+         }
+          catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/findbydate/all")
     @ApiOperation("Get All LecturersBookings by Date")
-    public List<LecturersBookings> getAllByDate(String date) {
-        return lecturersBookingsService.findByDate(LocalDate.parse(date));}
+    public ResponseEntity<?> getAllByDate(String date) {
+        try {
+            Collection<LecturersBookings> lecturersBookings = lecturersBookingsService.findByDate(LocalDate.parse(date));
+            return new ResponseEntity<Collection<LecturersBookings>>(lecturersBookings, HttpStatus.OK);
+        }
+          catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
 
 
     @GetMapping("/findbylecturerid/all")
     @ApiOperation("Get All LecturersBookings by LecturerId")
-    public List<LecturersBookings> getAllByDate(long id) {
-        return lecturersBookingsService.findBylecturerId(id);}
+    public ResponseEntity<?> getAllByDate(long id) {
+        try {
+            Collection<LecturersBookings> lecturersBookings = lecturersBookingsService.findBylecturerId(id);
+            return new ResponseEntity<Collection<LecturersBookings>>(lecturersBookings, HttpStatus.OK);
+        }
+          catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
 
 
     @GetMapping("/findbylecturerid/date/all")
     @ApiOperation("Get All LecturersBookings by Date and LecturerId")
-    public List<LecturersBookings> getAllByDateAndLecturerId(String date, long id) {
-        return lecturersBookingsService.findByDateAndLecturerId(LocalDate.parse(date), id);}
+    public ResponseEntity<?> getAllByDateAndLecturerId(String date, long id) {
+        try {
+            Collection<LecturersBookings> lecturersBookings = lecturersBookingsService.findByDateAndLecturerId(LocalDate.parse(date), id);
+            return new ResponseEntity<Collection<LecturersBookings>>(lecturersBookings, HttpStatus.OK);
+        }
+          catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
 }

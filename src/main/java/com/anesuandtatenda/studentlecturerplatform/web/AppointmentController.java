@@ -1,4 +1,5 @@
 package com.anesuandtatenda.studentlecturerplatform.web;
+import com.anesuandtatenda.studentlecturerplatform.local.ResponseMessage;
 import com.anesuandtatenda.studentlecturerplatform.local.exceptions.InvalidRequestException;
 import com.anesuandtatenda.studentlecturerplatform.local.requests.AppointmentRequest;
 import com.anesuandtatenda.studentlecturerplatform.local.requests.ApproveAppointmentRequest;
@@ -9,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,43 +30,80 @@ public class AppointmentController {
 
     @GetMapping("")
     @ApiOperation("Get Appointments")
-    public Page<Appointments> getAll(@PageableDefault(sort = "name") Pageable pageable,
-                                     @RequestParam(required = false) String search) {
-        return appointmentService.findAll(pageable, search);
+    public ResponseEntity<?> getAll(@PageableDefault(sort = "name") Pageable pageable,
+                                                     @RequestParam(required = false) String search) {
+        try {
+            Page<Appointments> appointments = appointmentService.findAll(pageable, search);
+            return new ResponseEntity<Page<Appointments>>(appointments, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/all")
     @ApiOperation("Get All Appointments")
-    public Collection<Appointments> getAll() {
-        return appointmentService.findAll();
+    public ResponseEntity<?> findAll() {
+        try {
+            Collection<Appointments> appointments = appointmentService.findAll();
+            return new ResponseEntity<Collection<Appointments>>(appointments, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/{appointmentId}")
     @ApiOperation("Get a Appointment by Id")
-    public Appointments getAppointment(@PathVariable long appointmentId) {
-        return appointmentService.findById(appointmentId);
+    public ResponseEntity<?> getAppointment(@PathVariable long appointmentId) {
+        try {
+            Appointments appointment = appointmentService.findById(appointmentId);
+            return new ResponseEntity<Appointments>(appointment, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @DeleteMapping("/{appointmentId}")
     @ApiOperation("Delete a Appointment by Id")
-    public void delete(@PathVariable long appointmentId) {
-        appointmentService.delete(appointmentId);
+    public ResponseEntity<?> delete(@PathVariable long appointmentId) {
+        try {
+            appointmentService.delete(appointmentId);
+            return new ResponseEntity<>(new ResponseMessage("success"), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
 
     @PostMapping("")
     @ApiOperation("Create Appointment")
-    public ResponseEntity<Appointments> create(@RequestBody AppointmentRequest request) {
-            return ResponseEntity.ok().body(appointmentService.create(request));
+    public ResponseEntity<?> create(@RequestBody AppointmentRequest request) {
+            try {
+                Appointments appointmentCreated = appointmentService.create(request);
+                return new ResponseEntity<Appointments>(appointmentCreated, HttpStatus.OK);
+            }
+            catch (Exception e){
+                return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+            }
     }
 
 
     @PutMapping("/approve-appointment/{appointmentId}")
     @ApiOperation("Approve Appointment")
-    public Appointments approveAppointment(@RequestBody ApproveAppointmentRequest request, @PathVariable long appointmentId) {
-        if(request.getAppointmentId() != appointmentId){
-            throw new InvalidRequestException("Invalid Request");
+    public ResponseEntity<?> approveAppointment(@RequestBody ApproveAppointmentRequest request, @PathVariable long appointmentId) {
+        try {
+            if(request.getAppointmentId() != appointmentId){
+                throw new InvalidRequestException("Invalid Request");
+            }
+            Appointments appointmentApproved = appointmentService.approveBooking(request);
+            return new ResponseEntity<Appointments>(appointmentApproved, HttpStatus.OK);
         }
-        return appointmentService.approveBooking(request);
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 }

@@ -19,7 +19,7 @@ public class Account implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@NotNull
 	@Column(name = "id")
 	private long id;
@@ -43,7 +43,7 @@ public class Account implements Serializable {
 	private int year;
 
 	@Size(max = 50)
-	@Column(name = "reg_number")
+	@Column(name = "reg_number",unique = true)
 	private String regNumber;
 
 	@ManyToOne
@@ -151,7 +151,6 @@ public class Account implements Serializable {
 		account.setFirstName(request.getFirstName());
 		account.setLastName(request.getLastName());
 		account.setUsername(request.getUsername());
-		account.setRegNumber(request.getRegNumber());
 		account.setYear(request.getYear());
 		account.setPassword(request.getPassword());
 		account.setRole(request.getRole());

@@ -1,5 +1,6 @@
 package com.anesuandtatenda.studentlecturerplatform.web;
 
+import com.anesuandtatenda.studentlecturerplatform.local.ResponseMessage;
 import com.anesuandtatenda.studentlecturerplatform.local.exceptions.InvalidRequestException;
 import com.anesuandtatenda.studentlecturerplatform.local.requests.ProgramCreateRequest;
 import com.anesuandtatenda.studentlecturerplatform.local.requests.ProgramUpdateRequest;
@@ -10,6 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -28,42 +31,78 @@ public class ProgramController {
 
     @GetMapping("")
     @ApiOperation("Get Programs")
-    public Page<Programs> getAll(@PageableDefault(sort = "name") Pageable pageable,
-                                 @RequestParam(required = false) String search) {
-        return programService.findAll(pageable, search);
+    public ResponseEntity<?> getAll(@PageableDefault(sort = "name") Pageable pageable,
+                                    @RequestParam(required = false) String search) {
+        try {
+            Page<Programs> programs = programService.findAll(pageable, search);
+            return new ResponseEntity<Page<Programs>>(programs,HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/all")
     @ApiOperation("Get All Programs")
-    public Collection<Programs> getAll() {
-        return programService.findAll();
+    public ResponseEntity<?> getAll() {
+        try {
+            Collection<Programs> programs = programService.findAll();
+            return new ResponseEntity<Collection<Programs>>(programs, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/{programId}")
     @ApiOperation("Get a Program by Id")
-    public Programs getProgram(@PathVariable long programId) {
-        return programService.findById(programId);
+    public ResponseEntity<?> getProgram(@PathVariable long programId) {
+        try {
+            Programs program = programService.findById(programId);
+            return new ResponseEntity<Programs>(program, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("/{programId}")
     @ApiOperation("Delete a Program by Id")
-    public void delete(@PathVariable long programId) {
-        programService.delete(programId);
+    public ResponseEntity<?> delete(@PathVariable long programId) {
+        try {
+            programService.delete(programId);
+            return new ResponseEntity<>(new ResponseMessage("success"), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
 
     @PostMapping("")
     @ApiOperation("Create Program")
-    public Programs create(@RequestBody ProgramCreateRequest request) {
-        return programService.create(request);
+    public ResponseEntity<?> create(@RequestBody ProgramCreateRequest request) {
+        try {
+            Programs programCreated = programService.create(request);
+            return new ResponseEntity<Programs>(programCreated, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping("/{programId}")
     @ApiOperation("Update Program")
-    public Programs update(@RequestBody ProgramUpdateRequest request, @PathVariable long programId) {
-        if(request.getId() != programId){
-            throw new InvalidRequestException("You can not delete this record as it might be used by another record");
+    public ResponseEntity<?> update(@RequestBody ProgramUpdateRequest request, @PathVariable long programId) {
+        try {
+            if(request.getId() != programId){
+                throw new InvalidRequestException("You can not delete this record as it might be used by another record");
+            }
+            Programs programUpdated = programService.update(request);
+            return new ResponseEntity<Programs>(programUpdated, HttpStatus.OK);
         }
-        return programService.update(request);
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 }

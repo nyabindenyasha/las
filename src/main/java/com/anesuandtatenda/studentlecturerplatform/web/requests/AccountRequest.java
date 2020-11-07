@@ -2,7 +2,6 @@ package com.anesuandtatenda.studentlecturerplatform.web.requests;
 
 import com.anesuandtatenda.studentlecturerplatform.model.enums.Role;
 
-import java.sql.Date;
 
 public class AccountRequest {
 
@@ -10,8 +9,7 @@ public class AccountRequest {
     private String lastName;
     private String username;
     private int year;
-    private String regNumber;
-    private long program;
+    private long programId;
     private Role role;
     private String password;
 
@@ -32,12 +30,8 @@ public class AccountRequest {
         return year;
     }
 
-    public String getRegNumber() {
-        return regNumber;
-    }
-
     public Long getProgram() {
-        return program;
+        return programId;
     }
 
     public Role getRole() {

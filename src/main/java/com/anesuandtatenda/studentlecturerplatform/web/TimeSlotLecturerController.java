@@ -1,21 +1,19 @@
 package com.anesuandtatenda.studentlecturerplatform.web;
 
 
+import com.anesuandtatenda.studentlecturerplatform.local.ResponseMessage;
 import com.anesuandtatenda.studentlecturerplatform.local.requests.TimeSlotLecturerRequest;
-import com.anesuandtatenda.studentlecturerplatform.model.LecturersBookings;
 import com.anesuandtatenda.studentlecturerplatform.model.TimeSlotLecturer;
 import com.anesuandtatenda.studentlecturerplatform.service.TimeSlotLecturerService;
-import com.anesuandtatenda.studentlecturerplatform.service.TimeSlotLecturerService;
+import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -31,39 +29,81 @@ public class TimeSlotLecturerController {
 
     @GetMapping("/all")
     @ApiOperation("Get All Lecturers Timeslots")
-    public Collection<TimeSlotLecturer> getAll() {
-        return timeSlotLecturerService.findAll();
+    public ResponseEntity<?> getAll() {
+        try {
+            Collection<TimeSlotLecturer> timeSlotLecturers = timeSlotLecturerService.findAll();
+            return new ResponseEntity<Collection<TimeSlotLecturer>>(timeSlotLecturers, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("")
     @ApiOperation("Create Lecturer Timeslot")
-    public TimeSlotLecturer create(@RequestBody TimeSlotLecturerRequest timeSlotLecturer) {
-        return timeSlotLecturerService.create(timeSlotLecturer);
+    public ResponseEntity<?> create(@RequestBody TimeSlotLecturerRequest timeSlotLecturer) {
+        try {
+            TimeSlotLecturer timeSlotLecturerCreated = timeSlotLecturerService.create(timeSlotLecturer);
+            return new ResponseEntity<TimeSlotLecturer>(timeSlotLecturerCreated, HttpStatus.OK);
+        } catch (Exception e){
+            if(e instanceof InvalidDefinitionException)
+                System.out.println("InvalidDefinitionException");
+            if(e instanceof com.fasterxml.jackson.databind.exc.InvalidDefinitionException)
+                System.out.println("com.fasterxml.jackson.databind.exc.InvalidDefinitionException");
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/findby-day-of-week/all")
     @ApiOperation("Get All Lecturers Timeslots by Day of Week")
-    public List<TimeSlotLecturer> getAllByDayOfWeek(int dayOfWeek) {
-        return timeSlotLecturerService.findByDayOfWeek(dayOfWeek);}
+    public ResponseEntity<?> getAllByDayOfWeek(int dayOfWeek) {
+        try {
+            Collection<TimeSlotLecturer> timeSlotLecturers = timeSlotLecturerService.findByDayOfWeek(dayOfWeek);
+            return new ResponseEntity<Collection<TimeSlotLecturer>>(timeSlotLecturers, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
 
 
     @GetMapping("/findby-lecturer-id/all")
     @ApiOperation("Get All Lecturers Timeslots by LecturerId")
-    public List<TimeSlotLecturer> getAllByLecturerId(long id) {
-        return timeSlotLecturerService.findByAccountId(id);}
+    public ResponseEntity<?> getAllByLecturerId(long id) {
+        try {
+            Collection<TimeSlotLecturer> timeSlotLecturers = timeSlotLecturerService.findByAccountId(id);
+            return new ResponseEntity<Collection<TimeSlotLecturer>>(timeSlotLecturers, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
 
 
     @GetMapping("/findbylecturerid/dayofweek/all")
     @ApiOperation("Get All Lecturers Timeslots by Day Of Week and LecturerId")
-    public List<TimeSlotLecturer> getAllByDateAndLecturerId(int dayOfWeek, long id) {
-        return timeSlotLecturerService.findByDayOfWeekAndAccountId(dayOfWeek, id);}
+    public ResponseEntity<?> getAllByDateAndLecturerId(int dayOfWeek, long id) {
+        try {
+            Collection<TimeSlotLecturer> timeSlotLecturers = timeSlotLecturerService.findByDayOfWeekAndAccountId(dayOfWeek, id);
+            return new ResponseEntity<Collection<TimeSlotLecturer>>(timeSlotLecturers, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @GetMapping("/findbylecturerid/date/all")
     @ApiOperation("Get All Lecturers Timeslots by Day Of Week and LecturerId")
-    public List<TimeSlotLecturer> getAllByDateAndLecturerId(String date, long id) {
-        LocalDate localDate = LocalDate.parse(date);
-        int dayOfWeek = localDate.getDayOfWeek().getValue();
-        System.out.println(dayOfWeek);
-        return timeSlotLecturerService.findByDayOfWeekAndAccountId(dayOfWeek, id);}
+    public ResponseEntity<?> getAllByDateAndLecturerId(String date, long id) {
+        try {
+            LocalDate localDate = LocalDate.parse(date);
+            int dayOfWeek = localDate.getDayOfWeek().getValue();
+            Collection<TimeSlotLecturer> timeSlotLecturers = timeSlotLecturerService.findByDayOfWeekAndAccountId(dayOfWeek, id);
+            return new ResponseEntity<Collection<TimeSlotLecturer>>(timeSlotLecturers, HttpStatus.OK);
+        }
+              catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
 
 }
