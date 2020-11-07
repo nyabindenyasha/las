@@ -1,6 +1,5 @@
 package com.anesuandtatenda.studentlecturerplatform.model;
 
-import com.anesuandtatenda.studentlecturerplatform.local.requests.DepartmentCreateRequest;
 import com.anesuandtatenda.studentlecturerplatform.local.requests.DepartmentUpdateRequest;
 import com.anesuandtatenda.studentlecturerplatform.web.requests.DepartmentRequest;
 
@@ -19,7 +18,7 @@ public class Department implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id")
 	private long id;
 

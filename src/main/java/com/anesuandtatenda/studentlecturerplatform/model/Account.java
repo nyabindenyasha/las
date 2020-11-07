@@ -2,12 +2,10 @@ package com.anesuandtatenda.studentlecturerplatform.model;
 
 import com.anesuandtatenda.studentlecturerplatform.model.enums.Role;
 import com.anesuandtatenda.studentlecturerplatform.web.requests.AccountRequest;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.sql.Date;
 
 /**
  *
@@ -19,7 +17,7 @@ public class Account implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@NotNull
 	@Column(name = "id")
 	private long id;
