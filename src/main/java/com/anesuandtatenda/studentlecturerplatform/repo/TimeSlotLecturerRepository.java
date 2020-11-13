@@ -11,4 +11,6 @@ public interface TimeSlotLecturerRepository extends BaseRepository<TimeSlotLectu
     List<TimeSlotLecturer> findByAccountId(long id);
 
     List<TimeSlotLecturer> findByDayOfWeekAndAccountId(int dayOfWeek, long id);
+
+  //  TimeSlotLecturer findByDayOfWeekAndAccountIdAAndTimeSlotsId(int dayOfWeek, long id, long timeSlotId);
 }

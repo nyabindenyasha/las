@@ -38,16 +38,17 @@ class UserAccountServiceImpl extends BaseServiceImpl<Account, AccountRequest, Ac
     @Override
     public Account create(AccountRequest request) {
 
-
-        boolean detailsExists = userAccountRepository.existsByUsername(request.getUsername());
-
-        if (detailsExists) {
-            throw new InvalidRequestException("UserAccount with the same name already exists");
-        }
-        Optional<Programs> program = programRepository.findById(request.getProgram());
+        Optional<Programs> program = programRepository.findById(request.getProgramId());
         Account userAccount = Account.fromCommand(request);
         userAccount.setProgram(program.get());
         String registrationNumber = generateRegistrationNumber();
+
+        boolean detailsExist = userAccountRepository.existsByRegNumber(registrationNumber);
+
+        if(detailsExist){
+            throw new InvalidRequestException("UserAccount already exist.");
+        }
+
         userAccount.setRegNumber(registrationNumber);;
         return userAccountRepository.save(userAccount);
     }
@@ -98,12 +99,12 @@ class UserAccountServiceImpl extends BaseServiceImpl<Account, AccountRequest, Ac
 
 
     @Override
-    public Account login(String username, String password) {
+    public Account login(String regNumber, String password) {
         Account account;
-        if (!userAccountRepository.existsByUsername(username)){
+        if (!userAccountRepository.existsByRegNumber(regNumber)){
             throw new InvalidRequestException("User does not exist");
         }
-        account=getAccountByName(username);
+        account=getAccountByName(regNumber);
         if (!account.getPassword().equals(password)){
             throw new InvalidRequestException("Wrong password");
         }
@@ -116,12 +117,12 @@ class UserAccountServiceImpl extends BaseServiceImpl<Account, AccountRequest, Ac
     }
 
     @Override
-    public Account getAccountByName(String username) {
-        boolean exists=userAccountRepository.existsByUsername(username);
+    public Account getAccountByName(String regNumber) {
+        boolean exists=userAccountRepository.existsByRegNumber(regNumber);
         if (!exists){
             throw new InvalidRequestException("User not registered");
         }
-        return userAccountRepository.getByUsername(username);
+        return userAccountRepository.getByRegNumber(regNumber);
     }
 
     @Override

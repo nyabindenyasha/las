@@ -41,7 +41,7 @@ class DepartmentServiceImpl extends BaseServiceImpl<Department, DepartmentReques
         if (detailsExists) {
             throw new InvalidRequestException("Department with the same name already exists");
         }
-        Optional<Facaulty> facaulty = facaultyRepository.findById(request.getFacaulty().longValue());
+        Optional<Facaulty> facaulty = facaultyRepository.findById(request.getFacaultyId());
         Department department=Department.fromCommand(request);
         department.setFacaulty(facaulty.get());
         return departmentRepository.save(department);

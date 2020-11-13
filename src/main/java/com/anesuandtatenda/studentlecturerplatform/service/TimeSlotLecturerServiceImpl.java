@@ -43,9 +43,16 @@ public class TimeSlotLecturerServiceImpl extends BaseServiceImpl<TimeSlotLecture
 
         timeSlotLecturer.setTimeSlots(timeSlotRepository.getOne(request.getTimeSlotId()));
 
+        List<TimeSlotLecturer> alreadyExisting = timeSlotLecturerRepository.findByDayOfWeekAndAccountId(request.getDayOfWeek(), request.getLecturerId());
+
         timeSlotLecturer.setDayOfWeek(request.getDayOfWeek());
 
-        return timeSlotLecturerRepository.save(timeSlotLecturer);
+        if(alreadyExisting.stream().anyMatch(timeSlotLecturerAlreadyExisting -> {
+          return timeSlotLecturerAlreadyExisting.getTimeSlots().getId() == request.getTimeSlotId();
+        }))
+            throw new InvalidRequestException("Lecturer already added to that time slot");
+        else
+           return timeSlotLecturerRepository.save(timeSlotLecturer);
     }
 
 
@@ -77,4 +84,9 @@ public class TimeSlotLecturerServiceImpl extends BaseServiceImpl<TimeSlotLecture
     public List<TimeSlotLecturer> findByDayOfWeekAndAccountId(int dayOfWeek, long id) {
         return timeSlotLecturerRepository.findByDayOfWeekAndAccountId(dayOfWeek, id);
     }
+
+//    @Override
+//    public TimeSlotLecturer findByDayOfWeekAndAccountIdAAndTimeSlotsId(int dayOfWeek, long id, long timeSlotId) {
+//        return timeSlotLecturerRepository.findByDayOfWeekAndAccountIdAAndTimeSlotsId(dayOfWeek, id, timeSlotId);
+//    }
 }

@@ -89,11 +89,11 @@ public class UserAccountController {
         }
     }
 
-    @PostMapping("/login/{username}/{password}")
+    @PostMapping("/login/{regNumber}/{password}")
     @ApiOperation("Login to the system")
-    public ResponseEntity<?> login(@PathVariable String username,@PathVariable String password){
+    public ResponseEntity<?> login(@PathVariable String regNumber,@PathVariable String password){
         try {
-            Account userLoggedIn = userAccountService.login(username,password);
+            Account userLoggedIn = userAccountService.login(regNumber,password);
             return new ResponseEntity<Account>(userLoggedIn, HttpStatus.OK);
         }
         catch (Exception e){
@@ -103,9 +103,9 @@ public class UserAccountController {
 
     @GetMapping("/v2/login")
     @ApiOperation("Login to the system")
-    public ResponseEntity<?> login2(@RequestParam String username,@RequestParam String password){
+    public ResponseEntity<?> login2(@RequestParam String regNumber,@RequestParam String password){
         try {
-            Account userLoggedIn = userAccountService.login(username,password);
+            Account userLoggedIn = userAccountService.login(regNumber,password);
             return new ResponseEntity<Account>(userLoggedIn, HttpStatus.OK);
         }
         catch (Exception e){

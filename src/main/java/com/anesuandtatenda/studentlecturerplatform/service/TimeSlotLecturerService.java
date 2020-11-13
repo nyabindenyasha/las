@@ -13,4 +13,6 @@ public interface TimeSlotLecturerService extends BaseService<TimeSlotLecturer, T
 
     List<TimeSlotLecturer> findByDayOfWeekAndAccountId(int dayOfWeek, long id);
 
+   // TimeSlotLecturer findByDayOfWeekAndAccountIdAAndTimeSlotsId(int dayOfWeek, long id, long timeSlotId);
+
 }

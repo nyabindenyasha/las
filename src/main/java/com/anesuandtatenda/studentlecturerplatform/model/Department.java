@@ -1,5 +1,6 @@
 package com.anesuandtatenda.studentlecturerplatform.model;
 
+import com.anesuandtatenda.studentlecturerplatform.local.requests.DepartmentCreateRequest;
 import com.anesuandtatenda.studentlecturerplatform.local.requests.DepartmentUpdateRequest;
 import com.anesuandtatenda.studentlecturerplatform.web.requests.DepartmentRequest;
 
