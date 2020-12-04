@@ -8,7 +8,6 @@ public class AccountRequest {
 
     private String firstName;
     private String lastName;
-    private String username;
     private int year;
     private long programId;
     private Role role;

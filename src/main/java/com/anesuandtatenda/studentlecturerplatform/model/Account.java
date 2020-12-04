@@ -150,7 +150,6 @@ public class Account implements Serializable {
 		Account account = new Account();
 		account.setFirstName(request.getFirstName());
 		account.setLastName(request.getLastName());
-		account.setUsername(request.getUsername());
 		account.setYear(request.getYear());
 		account.setPassword(request.getPassword());
 		account.setRole(request.getRole());
