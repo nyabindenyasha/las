@@ -5,6 +5,8 @@ import com.anesuandtatenda.studentlecturerplatform.model.Account;
 import com.anesuandtatenda.studentlecturerplatform.web.requests.AccountRequest;
 import com.anesuandtatenda.studentlecturerplatform.web.requests.LoginRequest;
 
+import java.util.Collection;
+
 public interface UserService extends BaseService<Account, AccountRequest, Account> {
 
     Account login(String username, String pasword);
@@ -20,6 +22,8 @@ public interface UserService extends BaseService<Account, AccountRequest, Accoun
     Account findByUsernameOrFirstname(String username, String firstName);
 
     String logout();
+
+    Collection<Account> findAllLecturers();
 
     //You can think of other functionalities we need on accounts management. Good nyt man.
 }

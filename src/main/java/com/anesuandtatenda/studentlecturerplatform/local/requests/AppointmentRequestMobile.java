@@ -6,13 +6,13 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class AppointmentRequest {
+public class AppointmentRequestMobile {
 
     private long id;
 
-    @JsonIgnore
     private String dateString;
 
+    @JsonIgnore
     private Date date;
 
     private boolean isOpen;

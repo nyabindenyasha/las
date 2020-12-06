@@ -2,6 +2,7 @@ package com.anesuandtatenda.studentlecturerplatform.model;
 
 import com.anesuandtatenda.studentlecturerplatform.model.enums.Role;
 import com.anesuandtatenda.studentlecturerplatform.web.requests.AccountRequest;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -20,7 +21,6 @@ public class Account implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@NotNull
 	@Column(name = "id")
 	private long id;
 
@@ -34,7 +34,7 @@ public class Account implements Serializable {
 	@Column(name = "last_name")
 	private String lastName;
 
-	@NotNull
+	@JsonIgnore
 	@Size(min = 1, max = 50)
 	@Column(name = "username")
 	private String username;
@@ -150,6 +150,7 @@ public class Account implements Serializable {
 		Account account = new Account();
 		account.setFirstName(request.getFirstName());
 		account.setLastName(request.getLastName());
+		account.setUsername("xxx");
 		account.setYear(request.getYear());
 		account.setPassword(request.getPassword());
 		account.setRole(request.getRole());

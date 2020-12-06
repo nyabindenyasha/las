@@ -1,7 +1,9 @@
 package com.anesuandtatenda.studentlecturerplatform.web;
+
 import com.anesuandtatenda.studentlecturerplatform.local.ResponseMessage;
 import com.anesuandtatenda.studentlecturerplatform.local.exceptions.InvalidRequestException;
 import com.anesuandtatenda.studentlecturerplatform.local.requests.AppointmentRequest;
+import com.anesuandtatenda.studentlecturerplatform.local.requests.AppointmentRequestMobile;
 import com.anesuandtatenda.studentlecturerplatform.local.requests.ApproveAppointmentRequest;
 import com.anesuandtatenda.studentlecturerplatform.model.Appointments;
 import com.anesuandtatenda.studentlecturerplatform.service.AppointmentService;
@@ -31,12 +33,11 @@ public class AppointmentController {
     @GetMapping("")
     @ApiOperation("Get Appointments")
     public ResponseEntity<?> getAll(@PageableDefault(sort = "name") Pageable pageable,
-                                                     @RequestParam(required = false) String search) {
+                                    @RequestParam(required = false) String search) {
         try {
             Page<Appointments> appointments = appointmentService.findAll(pageable, search);
             return new ResponseEntity<Page<Appointments>>(appointments, HttpStatus.OK);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
@@ -47,8 +48,7 @@ public class AppointmentController {
         try {
             Collection<Appointments> appointments = appointmentService.findAll();
             return new ResponseEntity<Collection<Appointments>>(appointments, HttpStatus.OK);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
@@ -59,11 +59,31 @@ public class AppointmentController {
         try {
             Appointments appointment = appointmentService.findById(appointmentId);
             return new ResponseEntity<Appointments>(appointment, HttpStatus.OK);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
+    }
 
+    @GetMapping("/findByLecturerId/{lecturerId}")
+    @ApiOperation("Get a Appointments by LecturerId")
+    public ResponseEntity<?> getAppointmentByLecturerId(@PathVariable long lecturerId) {
+        try {
+            Collection<Appointments> appointment = appointmentService.findByAppointmentWithId(lecturerId);
+            return new ResponseEntity<Collection<Appointments>>(appointment, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/findByStudentId/{studentId}")
+    @ApiOperation("Get a Appointment by StudentId")
+    public ResponseEntity<?> getAppointmentByStudentId(@PathVariable long studentId) {
+        try {
+            Collection<Appointments> appointment = appointmentService.findByAppointmentById(studentId);
+            return new ResponseEntity<Collection<Appointments>>(appointment, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("/{appointmentId}")
@@ -72,8 +92,7 @@ public class AppointmentController {
         try {
             appointmentService.delete(appointmentId);
             return new ResponseEntity<>(new ResponseMessage("success"), HttpStatus.OK);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
@@ -82,13 +101,23 @@ public class AppointmentController {
     @PostMapping("")
     @ApiOperation("Create Appointment")
     public ResponseEntity<?> create(@RequestBody AppointmentRequest request) {
-            try {
-                Appointments appointmentCreated = appointmentService.create(request);
-                return new ResponseEntity<Appointments>(appointmentCreated, HttpStatus.OK);
-            }
-            catch (Exception e){
-                return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
-            }
+        try {
+            Appointments appointmentCreated = appointmentService.create(request);
+            return new ResponseEntity<Appointments>(appointmentCreated, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/createFromMobile")
+    @ApiOperation("Create Appointment")
+    public ResponseEntity<?> createFromMobile(@RequestBody AppointmentRequestMobile request) {
+        try {
+            Appointments appointmentCreated = appointmentService.createFromMobile(request);
+            return new ResponseEntity<Appointments>(appointmentCreated, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
 
@@ -96,13 +125,12 @@ public class AppointmentController {
     @ApiOperation("Approve Appointment")
     public ResponseEntity<?> approveAppointment(@RequestBody ApproveAppointmentRequest request, @PathVariable long appointmentId) {
         try {
-            if(request.getAppointmentId() != appointmentId){
+            if (request.getAppointmentId() != appointmentId) {
                 throw new InvalidRequestException("Invalid Request");
             }
             Appointments appointmentApproved = appointmentService.approveBooking(request);
             return new ResponseEntity<Appointments>(appointmentApproved, HttpStatus.OK);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }

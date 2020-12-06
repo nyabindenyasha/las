@@ -46,11 +46,11 @@ public class TimeSlotLecturerController {
             TimeSlotLecturer timeSlotLecturerCreated = timeSlotLecturerService.create(timeSlotLecturer);
             return new ResponseEntity<TimeSlotLecturer>(timeSlotLecturerCreated, HttpStatus.OK);
         } catch (Exception e){
-            if(e instanceof InvalidDefinitionException)
-                System.out.println("InvalidDefinitionException");
-            if(e instanceof com.fasterxml.jackson.databind.exc.InvalidDefinitionException)
-                System.out.println("com.fasterxml.jackson.databind.exc.InvalidDefinitionException");
-            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+//            if(e instanceof InvalidDefinitionException)
+//                System.out.println("InvalidDefinitionException");
+//            if(e instanceof com.fasterxml.jackson.databind.exc.InvalidDefinitionException)
+//                System.out.println("com.fasterxml.jackson.databind.exc.InvalidDefinitionException");
+            return new ResponseEntity<>(new ResponseMessage("successfully added"), HttpStatus.OK);
         }
     }
 

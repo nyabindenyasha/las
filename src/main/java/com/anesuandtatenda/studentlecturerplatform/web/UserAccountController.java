@@ -52,6 +52,18 @@ public class UserAccountController {
         }
     }
 
+    @GetMapping("/getLecturers/all")
+    @ApiOperation("Get All UserAccounts")
+    public ResponseEntity<?> getLecturers() {
+        try {
+            Collection<Account> accounts = userAccountService.findAllLecturers();
+            return new ResponseEntity<Collection<Account>>(accounts, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping("/{userAccountId}")
     @ApiOperation("Get a UserAccount by Id")
     public ResponseEntity<?> getUserAccount(@PathVariable long userAccountId) {
@@ -101,9 +113,10 @@ public class UserAccountController {
         }
     }
 
+
     @GetMapping("/v2/login")
     @ApiOperation("Login to the system")
-    public ResponseEntity<?> login2(@RequestParam String regNumber,@RequestParam String password){
+    public ResponseEntity<?> loginv2(@RequestParam String regNumber,@RequestParam String password){
         try {
             Account userLoggedIn = userAccountService.login(regNumber,password);
             return new ResponseEntity<Account>(userLoggedIn, HttpStatus.OK);

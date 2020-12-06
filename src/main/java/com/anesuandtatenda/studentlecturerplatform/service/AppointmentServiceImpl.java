@@ -4,6 +4,7 @@ import com.anesuandtatenda.studentlecturerplatform.local.Utils;
 import com.anesuandtatenda.studentlecturerplatform.local.exceptions.AppointmentBookingFailedException;
 import com.anesuandtatenda.studentlecturerplatform.local.exceptions.InvalidRequestException;
 import com.anesuandtatenda.studentlecturerplatform.local.requests.AppointmentRequest;
+import com.anesuandtatenda.studentlecturerplatform.local.requests.AppointmentRequestMobile;
 import com.anesuandtatenda.studentlecturerplatform.local.requests.ApproveAppointmentRequest;
 import com.anesuandtatenda.studentlecturerplatform.model.*;
 import com.anesuandtatenda.studentlecturerplatform.model.enums.ValidateAppointmentResponses;
@@ -11,7 +12,10 @@ import com.anesuandtatenda.studentlecturerplatform.repo.*;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolationException;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -74,6 +78,51 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
         return validateAppointmentBookingResult;
     }
 
+    @Override
+    public Appointments createFromMobile(AppointmentRequestMobile request) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+
+        LocalDateTime dateTime = LocalDateTime.parse(request.getDateString(), formatter);
+
+        request.setDate(Utils.convertToDateViaInstant(dateTime));
+
+        boolean detailsExists = appointmentRepository.existsById(request.getId());
+
+        if (detailsExists) {
+            throw new InvalidRequestException("Appointment with the same name already exists");
+        }
+
+        Account appointmentBy = userAccountRepository.getOne(request.getAppointmentBy());
+
+        Account appointmentWith = userAccountRepository.getOne(request.getAppointmentWith());
+
+        Appointments appointment = new Appointments();
+
+        appointment.setAppointmentBy(appointmentBy);
+
+        appointment.setAppointmentWith(appointmentWith);
+
+        appointment.setAnticipatedDuration(request.getAnticipatedDuration());
+
+        appointment.setDate(request.getDate());
+
+        //    appointment.fromCommand(appointment);
+
+        Appointments validateAppointmentBookingResult = validateAppointmentBooking(appointment);
+
+        return validateAppointmentBookingResult;
+    }
+
+    @Override
+    public Collection<Appointments> findByAppointmentWithId(long id) {
+        return appointmentRepository.findByAppointmentWithId(id);
+    }
+
+    @Override
+    public Collection<Appointments> findByAppointmentById(long id) {
+        return appointmentRepository.findByAppointmentById(id);
+    }
 
     @Override
     public Appointments update(AppointmentRequest updateDto) {
@@ -85,15 +134,22 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
         boolean appointmentDetailsExists = appointmentRepository.existsById(request.getAppointmentId());
 
+        Appointments appointment = findById(request.getAppointmentId());
+
+      //  LecturersBookings lecturerBooking = lecturersBookingsRepository.findByDateAndLecturerId(appointment.getDate(), )
+
         boolean lecturerDetailsExists = lecturersBookingsRepository.existsById(request.getLecturerBookingId());
 
-        if (!appointmentDetailsExists || !lecturerDetailsExists) {
+//        if (!appointmentDetailsExists || !lecturerDetailsExists) {
+//            throw new InvalidRequestException("Appointment not found");
+//        }
+
+
+        if (!appointmentDetailsExists) {
             throw new InvalidRequestException("Appointment not found");
         }
 
-        Appointments appointment = findById(request.getAppointmentId());
-
-        LecturersBookings booking = lecturersBookingsRepository.findById(request.getLecturerBookingId()).get();
+    //    LecturersBookings booking = lecturersBookingsRepository.findById(request.getLecturerBookingId()).get();
 
         Account student = userAccountRepository.getOne(appointment.getAppointmentBy().getId());
 
@@ -103,10 +159,16 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
             appointment.setIsApproaved(true);
 
-            booking.setApproaved(true);
+  //          booking.setApproaved(true);
 
-            lecturersBookingsRepository.save(booking);
+  //          lecturersBookingsRepository.save(booking);
         }
+
+        appointment.setIsApproaved(true);
+
+        System.out.println(appointment);
+
+        appointmentRepository.save(appointment);
 
         return appointmentRepository.save(appointment);
     }

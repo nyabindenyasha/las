@@ -3,6 +3,7 @@ package com.anesuandtatenda.studentlecturerplatform.service;
 import com.anesuandtatenda.studentlecturerplatform.local.exceptions.InvalidRequestException;
 import com.anesuandtatenda.studentlecturerplatform.model.Account;
 import com.anesuandtatenda.studentlecturerplatform.model.Programs;
+import com.anesuandtatenda.studentlecturerplatform.model.enums.Role;
 import com.anesuandtatenda.studentlecturerplatform.repo.ProgramRepository;
 import com.anesuandtatenda.studentlecturerplatform.repo.UserAccountRepository;
 import com.anesuandtatenda.studentlecturerplatform.web.requests.AccountRequest;
@@ -10,9 +11,11 @@ import com.anesuandtatenda.studentlecturerplatform.web.requests.LoginRequest;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.stream.Collectors;
 
 import lombok.val;
 
@@ -39,6 +42,10 @@ class UserAccountServiceImpl extends BaseServiceImpl<Account, AccountRequest, Ac
     public Account create(AccountRequest request) {
 
         Optional<Programs> program = programRepository.findById(request.getProgramId());
+
+        if(request.getRole() == Role.STUDENT && request.getYear() < 1)
+            throw new InvalidRequestException("Year of study is required.");
+
         Account userAccount = Account.fromCommand(request);
         userAccount.setProgram(program.get());
         String registrationNumber = generateRegistrationNumber();
@@ -162,6 +169,13 @@ class UserAccountServiceImpl extends BaseServiceImpl<Account, AccountRequest, Ac
     @Override
     public String logout() {
         return null;
+    }
+
+    @Override
+    public Collection<Account> findAllLecturers() {
+        Collection<Account> accounts = userAccountRepository.findAll();
+        Collection<Account> lecturers = accounts.parallelStream().filter(account -> account.getRole() == Role.LECTURER).collect(Collectors.toList());
+        return lecturers;
     }
 }
 
