@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalTime;
 import java.util.Collection;
 
 @CrossOrigin
@@ -35,8 +36,7 @@ public class TimeSlotController {
         try {
             Page<TimeSlots> timeSlots = timeSlotService.findAll(pageable, search);
             return new ResponseEntity<Page<TimeSlots>>(timeSlots, HttpStatus.OK);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
@@ -47,8 +47,7 @@ public class TimeSlotController {
         try {
             Collection<TimeSlots> timeSlots = timeSlotService.findAll();
             return new ResponseEntity<Collection<TimeSlots>>(timeSlots, HttpStatus.OK);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
@@ -59,8 +58,18 @@ public class TimeSlotController {
         try {
             TimeSlots timeSlot = timeSlotService.findById(timeSlotId);
             return new ResponseEntity<TimeSlots>(timeSlot, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
-        catch (Exception e){
+    }
+
+    @GetMapping("/findByStartTime/{startTime}")
+    @ApiOperation("Get a TimeSlot by startTime")
+    public ResponseEntity<?> getTimeSlotByStartTime(@PathVariable String startTime) {
+        try {
+            TimeSlots timeSlot = timeSlotService.findByStartTime(LocalTime.parse(startTime));
+            return new ResponseEntity<TimeSlots>(timeSlot, HttpStatus.OK);
+        } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
@@ -71,8 +80,7 @@ public class TimeSlotController {
         try {
             timeSlotService.delete(timeSlotId);
             return new ResponseEntity<>(new ResponseMessage("success"), HttpStatus.OK);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
@@ -84,8 +92,7 @@ public class TimeSlotController {
         try {
             TimeSlots timeSlotCreated = timeSlotService.create(request);
             return new ResponseEntity<TimeSlots>(timeSlotCreated, HttpStatus.OK);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
@@ -94,13 +101,12 @@ public class TimeSlotController {
     @ApiOperation("Update TimeSlot")
     public ResponseEntity<?> update(@RequestBody TimeSlotsRequest request, @PathVariable long timeSlotId) {
         try {
-            if(request.getId() != timeSlotId){
+            if (request.getId() != timeSlotId) {
                 throw new InvalidRequestException("You can not delete this record as it might be used by another record");
             }
             TimeSlots timeSlotUpdated = timeSlotService.update(request);
             return new ResponseEntity<TimeSlots>(timeSlotUpdated, HttpStatus.OK);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }

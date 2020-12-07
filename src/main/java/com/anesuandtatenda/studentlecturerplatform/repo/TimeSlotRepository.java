@@ -9,6 +9,8 @@ public interface TimeSlotRepository extends BaseRepository<TimeSlots> {
 
     boolean existsByName(String name);
 
+    boolean existsByStartTimeAndEndTime(LocalTime startTime, LocalTime endTime);
+
     TimeSlots findByStartTime(LocalTime startTime);
 
 }

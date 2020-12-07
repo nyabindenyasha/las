@@ -8,16 +8,14 @@ import com.anesuandtatenda.studentlecturerplatform.repo.ProgramRepository;
 import com.anesuandtatenda.studentlecturerplatform.repo.UserAccountRepository;
 import com.anesuandtatenda.studentlecturerplatform.web.requests.AccountRequest;
 import com.anesuandtatenda.studentlecturerplatform.web.requests.LoginRequest;
+import lombok.val;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.stream.Collectors;
-
-import lombok.val;
 
 
 @Service
@@ -43,7 +41,7 @@ class UserAccountServiceImpl extends BaseServiceImpl<Account, AccountRequest, Ac
 
         Optional<Programs> program = programRepository.findById(request.getProgramId());
 
-        if(request.getRole() == Role.STUDENT && request.getYear() < 1)
+        if (request.getRole() == Role.STUDENT && request.getYear() < 1)
             throw new InvalidRequestException("Year of study is required.");
 
         Account userAccount = Account.fromCommand(request);
@@ -52,26 +50,27 @@ class UserAccountServiceImpl extends BaseServiceImpl<Account, AccountRequest, Ac
 
         boolean detailsExist = userAccountRepository.existsByRegNumber(registrationNumber);
 
-        if(detailsExist){
+        if (detailsExist) {
             throw new InvalidRequestException("UserAccount already exist.");
         }
 
-        userAccount.setRegNumber(registrationNumber);;
+        userAccount.setRegNumber(registrationNumber);
+        ;
         return userAccountRepository.save(userAccount);
     }
 
-    String generateRegistrationNumber(){
+    String generateRegistrationNumber() {
         int leftLimit = 48; // numeral '0'
         int rightLimit = 122; // letter 'z'
         int targetStringLength = 10;
-        Random random=new Random();
+        Random random = new Random();
 
         String registrationNumber = random.ints(leftLimit, rightLimit + 1)
                 .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
                 .limit(targetStringLength)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
-        boolean existByRegNumber=userAccountRepository.existsByRegNumber(registrationNumber);
+        boolean existByRegNumber = userAccountRepository.existsByRegNumber(registrationNumber);
         if (existByRegNumber) {
             generateRegistrationNumber();
         }
@@ -108,14 +107,27 @@ class UserAccountServiceImpl extends BaseServiceImpl<Account, AccountRequest, Ac
     @Override
     public Account login(String regNumber, String password) {
         Account account;
-        if (!userAccountRepository.existsByRegNumber(regNumber)){
+        if (!userAccountRepository.existsByRegNumber(regNumber)) {
             throw new InvalidRequestException("User does not exist");
         }
-        account=getAccountByName(regNumber);
-        if (!account.getPassword().equals(password)){
+        account = getAccountByName(regNumber);
+        if (!account.getPassword().equals(password)) {
             throw new InvalidRequestException("Wrong password");
         }
-        return  account;
+        return account;
+    }
+
+    @Override
+    public Account login(LoginRequest request) {
+        Account account;
+        if (!userAccountRepository.existsByRegNumber(request.getRegNumber())) {
+            throw new InvalidRequestException("User does not exist");
+        }
+        account = getAccountByName(request.getRegNumber());
+        if (!account.getPassword().equals(request.getPassword())) {
+            throw new InvalidRequestException("Wrong password");
+        }
+        return account;
     }
 
     @Override
@@ -125,8 +137,8 @@ class UserAccountServiceImpl extends BaseServiceImpl<Account, AccountRequest, Ac
 
     @Override
     public Account getAccountByName(String regNumber) {
-        boolean exists=userAccountRepository.existsByRegNumber(regNumber);
-        if (!exists){
+        boolean exists = userAccountRepository.existsByRegNumber(regNumber);
+        if (!exists) {
             throw new InvalidRequestException("User not registered");
         }
         return userAccountRepository.getByRegNumber(regNumber);
@@ -135,34 +147,30 @@ class UserAccountServiceImpl extends BaseServiceImpl<Account, AccountRequest, Ac
     @Override
     public Account findByUsername(String username) {
         return userAccountRepository.findByUsername(username).get();
-          //      .orElseThrow(() -> new InvalidRequestException("User record was not found for the supplied username"));
+        //      .orElseThrow(() -> new InvalidRequestException("User record was not found for the supplied username"));
     }
 
     @Override
     public Account findByFirstName(String firstName) {
         return userAccountRepository.findByFirstName(firstName).get();
-           //     .orElseThrow(() -> new InvalidRequestException("User record was not found for the supplied firstName"));
+        //     .orElseThrow(() -> new InvalidRequestException("User record was not found for the supplied firstName"));
     }
 
     @Override
-    public Account findByUsernameOrFirstname(String username, String firstName){
+    public Account findByUsernameOrFirstname(String username, String firstName) {
 
         boolean userByUsernameExists = userAccountRepository.existsByUsername(username);
         boolean userByFirstNameExists = userAccountRepository.existsByFirstName(firstName);
 
-        if(userByUsernameExists) {
-          val userByUsername = findByUsername(username);
+        if (userByUsernameExists) {
+            val userByUsername = findByUsername(username);
             System.out.println(userByUsername);
             return userByUsername;
-        }
-
-        else if(userByFirstNameExists) {
-           val userByFirstName = findByFirstName(firstName);
+        } else if (userByFirstNameExists) {
+            val userByFirstName = findByFirstName(firstName);
             System.out.println(userByFirstName);
             return userByFirstName;
-        }
-
-        else
+        } else
             throw new InvalidRequestException("User record was not found for the supplied firstName or username");
     }
 

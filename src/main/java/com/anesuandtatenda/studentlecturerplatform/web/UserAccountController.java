@@ -4,6 +4,7 @@ import com.anesuandtatenda.studentlecturerplatform.local.exceptions.InvalidReque
 import com.anesuandtatenda.studentlecturerplatform.model.Account;
 import com.anesuandtatenda.studentlecturerplatform.service.UserService;
 import com.anesuandtatenda.studentlecturerplatform.web.requests.AccountRequest;
+import com.anesuandtatenda.studentlecturerplatform.web.requests.LoginRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
@@ -119,6 +120,18 @@ public class UserAccountController {
     public ResponseEntity<?> loginv2(@RequestParam String regNumber,@RequestParam String password){
         try {
             Account userLoggedIn = userAccountService.login(regNumber,password);
+            return new ResponseEntity<Account>(userLoggedIn, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/v3/login")
+    @ApiOperation("Login to the system")
+    public ResponseEntity<?> loginv3(@RequestBody LoginRequest loginRequest){
+        try {
+            Account userLoggedIn = userAccountService.login(loginRequest);
             return new ResponseEntity<Account>(userLoggedIn, HttpStatus.OK);
         }
         catch (Exception e){

@@ -235,6 +235,12 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
             else {
                 TimeSlots freeTimeSlotForLecturerOnThatDay = timeSlotLecturers.get(0).getTimeSlots();
 
+                System.out.println("xxx");
+
+                System.out.println(freeTimeSlotForLecturerOnThatDay);
+
+                System.out.println(evaluateTimeSlotByTime(Utils.convertToLocalTime(appointment.getDate())));
+
                 if(freeTimeSlotForLecturerOnThatDay.getId() == evaluateTimeSlotByTime(Utils.convertToLocalTime(appointment.getDate())).getId()){
 
                     appointment.setIsApproaved(false);
@@ -265,21 +271,23 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
     TimeSlots evaluateTimeSlotByTime(LocalTime time){
 
+        System.out.println(timeSlotRepository.findAll());
+
         if(time.isAfter(LocalTime.parse("08:00")) && time.isBefore(LocalTime.parse("10:00")))
          //   return timeSlotRepository.findByStartTime(LocalTime.parse("08:00"));
-            return timeSlotRepository.findAll().get(0);
+            return timeSlotRepository.findByStartTime(LocalTime.parse("08:00"));
 
         else if(time.isAfter(LocalTime.parse("10:15")) && time.isBefore(LocalTime.parse("12:15")))
           //  return timeSlotRepository.findByStartTime(LocalTime.parse("10:15"));
-            return timeSlotRepository.findAll().get(1);
+            return timeSlotRepository.findByStartTime(LocalTime.parse("10:15"));
 
         else if(time.isAfter(LocalTime.parse("13:00")) && time.isBefore(LocalTime.parse("15:00")))
 //            return timeSlotRepository.findByStartTime(LocalTime.parse("13:00"));
-            return timeSlotRepository.findAll().get(2);
+            return timeSlotRepository.findByStartTime(LocalTime.parse("13:00"));
 
         else
 //            return timeSlotRepository.findByStartTime(LocalTime.parse("15:00"));
-            return timeSlotRepository.findAll().get(3);
+            return timeSlotRepository.findByStartTime(LocalTime.parse("15:00"));
     }
 
 }

@@ -11,6 +11,8 @@ public interface UserService extends BaseService<Account, AccountRequest, Accoun
 
     Account login(String username, String pasword);
 
+    Account login(LoginRequest request);
+
     Account updatePassword(LoginRequest request);
 
     Account getAccountByName(String username);

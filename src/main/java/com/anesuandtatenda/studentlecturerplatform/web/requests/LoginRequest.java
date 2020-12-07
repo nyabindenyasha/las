@@ -1,15 +1,11 @@
 package com.anesuandtatenda.studentlecturerplatform.web.requests;
 
+import lombok.Data;
+
+@Data
 public class LoginRequest {
 
-    private String username;
+    private String regNumber;
     private String password;
 
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
 }

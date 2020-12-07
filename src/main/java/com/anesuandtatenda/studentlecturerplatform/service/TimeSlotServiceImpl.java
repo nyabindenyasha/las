@@ -7,6 +7,8 @@ import com.anesuandtatenda.studentlecturerplatform.repo.TimeSlotRepository;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
+
 @Service
 class TimeSlotServiceImpl extends BaseServiceImpl<TimeSlots, TimeSlotsRequest, TimeSlotsRequest> implements TimeSlotService {
 
@@ -25,10 +27,10 @@ class TimeSlotServiceImpl extends BaseServiceImpl<TimeSlots, TimeSlotsRequest, T
     @Override
     public TimeSlots create(TimeSlotsRequest request) {
 
-        boolean detailsExists = timeSlotRepository.existsByName(request.getName());
+        boolean detailsExists = timeSlotRepository.existsByName(request.getName()) || timeSlotRepository.existsByStartTimeAndEndTime(LocalTime.parse(request.getStartTime()), LocalTime.parse(request.getEndTime()));
 
         if (detailsExists) {
-            throw new InvalidRequestException("TimeSlot with the same name already exists");
+            throw new InvalidRequestException("TimeSlot already exist!");
         }
 
         TimeSlots timeSlot = TimeSlots.fromCommand(request);
@@ -60,6 +62,11 @@ class TimeSlotServiceImpl extends BaseServiceImpl<TimeSlots, TimeSlotsRequest, T
         } catch (ConstraintViolationException var3) {
             throw new InvalidRequestException("You can not delete this record is might be used by another record");
         }
+    }
+
+    @Override
+    public TimeSlots findByStartTime(LocalTime startTime) {
+        return timeSlotRepository.findByStartTime(startTime);
     }
 }
 
