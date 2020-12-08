@@ -2,26 +2,27 @@ package com.anesuandtatenda.studentlecturerplatform;
 
 import com.anesuandtatenda.studentlecturerplatform.local.requests.TimeSlotsRequest;
 import com.anesuandtatenda.studentlecturerplatform.model.TimeSlots;
+import com.anesuandtatenda.studentlecturerplatform.repo.TimeSlotRepository;
 import com.anesuandtatenda.studentlecturerplatform.service.TimeSlotService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 
-@Component
+//@Component
 public class CommandLineAppStartupRunner implements CommandLineRunner {
 
-    private final TimeSlotService timeSlotService;
+    private final TimeSlotRepository timeSlotRepository;
 
-    CommandLineAppStartupRunner(TimeSlotService timeSlotService){
-        this.timeSlotService = timeSlotService;
+    CommandLineAppStartupRunner(TimeSlotRepository timeSlotRepository){
+        this.timeSlotRepository = timeSlotRepository;
     }
 
     @Override
     public void run(String... args) throws Exception {
         System.out.println("CommandLineRunner");
 
-        Collection<TimeSlots> timeSlotsCollection = timeSlotService.findAll();
+        Collection<TimeSlots> timeSlotsCollection = timeSlotRepository.findAll();
 
         if (timeSlotsCollection.isEmpty() || timeSlotsCollection.size() == 0) {
 
@@ -31,25 +32,29 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
             timeSlotsRequest.setStartTime("08:00");
             timeSlotsRequest.setStartTime("10:00");
 
-            timeSlotService.create(timeSlotsRequest);
+            TimeSlots timeSlots = TimeSlots.fromCommand(timeSlotsRequest);
+            timeSlotRepository.save(timeSlots);
 
             timeSlotsRequest.setName("SECOND");
             timeSlotsRequest.setStartTime("10:15");
             timeSlotsRequest.setStartTime("12:15");
 
-            timeSlotService.create(timeSlotsRequest);
+            timeSlots = TimeSlots.fromCommand(timeSlotsRequest);
+            timeSlotRepository.save(timeSlots);
 
             timeSlotsRequest.setName("THIRD");
             timeSlotsRequest.setStartTime("13:00");
             timeSlotsRequest.setStartTime("15:00");
 
-            timeSlotService.create(timeSlotsRequest);
+            timeSlots = TimeSlots.fromCommand(timeSlotsRequest);
+            timeSlotRepository.save(timeSlots);
 
             timeSlotsRequest.setName("FIRST");
             timeSlotsRequest.setStartTime("15:00");
             timeSlotsRequest.setStartTime("17:00");
 
-            timeSlotService.create(timeSlotsRequest);
+            timeSlots = TimeSlots.fromCommand(timeSlotsRequest);
+            timeSlotRepository.save(timeSlots);
         }
 
 

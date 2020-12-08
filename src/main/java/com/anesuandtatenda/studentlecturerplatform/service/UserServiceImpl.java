@@ -12,6 +12,7 @@ import lombok.val;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Random;
@@ -41,40 +42,27 @@ class UserAccountServiceImpl extends BaseServiceImpl<Account, AccountRequest, Ac
 
         Optional<Programs> program = programRepository.findById(request.getProgramId());
 
+        Programs programs = program.get();
+
+        if(programs == null)
+            programs = new Programs();
+
+        Collection<Programs> programsCollection = new ArrayList<>();
+        programsCollection.add(programs);
+
         if (request.getRole() == Role.STUDENT && request.getYear() < 1)
             throw new InvalidRequestException("Year of study is required.");
 
         Account userAccount = Account.fromCommand(request);
-        userAccount.setProgram(program.get());
-        String registrationNumber = generateRegistrationNumber();
+        userAccount.setProgram(programsCollection);
 
-        boolean detailsExist = userAccountRepository.existsByRegNumber(registrationNumber);
+        boolean detailsExist = userAccountRepository.existsByRegNumber(request.getRegNumber());
 
         if (detailsExist) {
             throw new InvalidRequestException("UserAccount already exist.");
         }
 
-        userAccount.setRegNumber(registrationNumber);
-        ;
         return userAccountRepository.save(userAccount);
-    }
-
-    String generateRegistrationNumber() {
-        int leftLimit = 48; // numeral '0'
-        int rightLimit = 122; // letter 'z'
-        int targetStringLength = 10;
-        Random random = new Random();
-
-        String registrationNumber = random.ints(leftLimit, rightLimit + 1)
-                .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
-                .limit(targetStringLength)
-                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                .toString();
-        boolean existByRegNumber = userAccountRepository.existsByRegNumber(registrationNumber);
-        if (existByRegNumber) {
-            generateRegistrationNumber();
-        }
-        return registrationNumber;
     }
 
 
