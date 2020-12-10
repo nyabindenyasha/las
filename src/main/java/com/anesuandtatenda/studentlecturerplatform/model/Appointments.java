@@ -7,177 +7,196 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- *
  * @author GustTech
  */
 @Entity
 @Table(name = "appointments")
 public class Appointments implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id")
-	private long id;
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private long id;
 
-	@NotNull
-	@Column(name = "date")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date date;
+    @NotNull
+    @Column(name = "date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date date;
 
-	@Column(name = "is_open")
-	private boolean isOpen;
+    @Column(name = "is_open")
+    private boolean isOpen;
 
-	@Size(max = 250)
-	@Column(name = "comment")
-	private String comment;
+    @Size(max = 250)
+    @Column(name = "comment")
+    private String comment;
 
-	@Column(name = "is_approaved")
-	private boolean isApproaved;
+    @Column(name = "is_approaved")
+    private boolean isApproaved;
 
-	@NotNull
-	@Column(name = "anticipated_duration")
-	private int anticipatedDuration;
+    @NotNull
+    @Column(name = "anticipated_duration")
+    private long anticipatedDuration;
 
-	@Column(name = "approved_duration")
-	private int approvedDuration;
+    @Column(name = "approved_duration")
+    private long approvedDuration;
 
-	@JoinColumn(name = "appointment_with", referencedColumnName = "id")
-	@ManyToOne(optional = false)
-	private Account appointmentWith;
+//	@JoinColumn(name = "appointment_with", referencedColumnName = "id")
+//	@ManyToOne(optional = false)
+//	private Account appointmentWith;
 
-	@JoinColumn(name = "appointment_by", referencedColumnName = "id")
-	@ManyToOne(optional = false)
-	private Account appointmentBy;
+    private long appointmentWith;
 
-	public Appointments() {
-	}
+//	@JoinColumn(name = "appointment_by", referencedColumnName = "id")
+//	@ManyToOne(optional = false)
+//	private Account appointmentBy;
 
-	public Appointments(Integer id) {
-		this.id = id;
-	}
+    private long appointmentBy;
 
-	public Appointments(Integer id, Date date, boolean isOpen, boolean isApproaved, int anticipatedDuration) {
-		this.id = id;
-		this.date = date;
-		this.isOpen = isOpen;
-		this.isApproaved = isApproaved;
-		this.anticipatedDuration = anticipatedDuration;
-	}
+    public Appointments() {
+    }
 
-	public long getId() {
-		return id;
-	}
+    public Appointments(Integer id) {
+        this.id = id;
+    }
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    public Appointments(Integer id, Date date, boolean isOpen, boolean isApproaved, long anticipatedDuration) {
+        this.id = id;
+        this.date = date;
+        this.isOpen = isOpen;
+        this.isApproaved = isApproaved;
+        this.anticipatedDuration = anticipatedDuration;
+    }
 
-	public Date getDate() {
-		return date;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public void setDate(Date date) {
-		this.date = date;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public boolean getIsOpen() {
-		return isOpen;
-	}
+    public Date getDate() {
+        return date;
+    }
 
-	public void setIsOpen(boolean isOpen) {
-		this.isOpen = isOpen;
-	}
+    public void setDate(Date date) {
+        this.date = date;
+    }
 
-	public String getComment() {
-		return comment;
-	}
+    public boolean getIsOpen() {
+        return isOpen;
+    }
 
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
+    public void setIsOpen(boolean isOpen) {
+        this.isOpen = isOpen;
+    }
 
-	public boolean getIsApproaved() {
-		return isApproaved;
-	}
+    public String getComment() {
+        return comment;
+    }
 
-	public void setIsApproaved(boolean isApproaved) {
-		this.isApproaved = isApproaved;
-	}
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 
-	public int getAnticipatedDuration() {
-		return anticipatedDuration;
-	}
+    public boolean getIsApproaved() {
+        return isApproaved;
+    }
 
-	public void setAnticipatedDuration(int anticipatedDuration) {
-		this.anticipatedDuration = anticipatedDuration;
-	}
+    public void setIsApproaved(boolean isApproaved) {
+        this.isApproaved = isApproaved;
+    }
 
-	public Account getAppointmentWith() {
-		return appointmentWith;
-	}
+    public long getAnticipatedDuration() {
+        return anticipatedDuration;
+    }
 
-	public void setAppointmentWith(Account appointmentWith) {
-		this.appointmentWith = appointmentWith;
-	}
+    public void setAnticipatedDuration(long anticipatedDuration) {
+        this.anticipatedDuration = anticipatedDuration;
+    }
 
-	public Account getAppointmentBy() {
-		return appointmentBy;
-	}
+//	public Account getAppointmentWith() {
+//		return appointmentWith;
+//	}
+//
+//	public void setAppointmentWith(Account appointmentWith) {
+//		this.appointmentWith = appointmentWith;
+//	}
+//
+//	public Account getAppointmentBy() {
+//		return appointmentBy;
+//	}
+//
+//	public void setAppointmentBy(Account appointmentBy) {
+//		this.appointmentBy = appointmentBy;
+//	}
 
-	public void setAppointmentBy(Account appointmentBy) {
-		this.appointmentBy = appointmentBy;
-	}
+    public long getAppointmentWith() {
+        return appointmentWith;
+    }
 
-    public int getApprovedDuration() {
+    public void setAppointmentWith(long appointmentWith) {
+        this.appointmentWith = appointmentWith;
+    }
+
+    public long getAppointmentBy() {
+        return appointmentBy;
+    }
+
+    public void setAppointmentBy(long appointmentBy) {
+        this.appointmentBy = appointmentBy;
+    }
+
+    public long getApprovedDuration() {
         return approvedDuration;
     }
 
-    public void setApprovedDuration(int approvedDuration) {
+    public void setApprovedDuration(long approvedDuration) {
         this.approvedDuration = approvedDuration;
     }
 
     public static Appointments fromCommand(Appointments request) {
 
-		if (request == null) {
-			return null;
-		}
+        if (request == null) {
+            return null;
+        }
 
-		Appointments appointments = new Appointments();
-		appointments.setDate(request.getDate());
-		appointments.setIsOpen(request.getIsOpen());
-		appointments.setComment(request.getComment());
-		appointments.setIsApproaved(request.getIsApproaved());
-		appointments.setApprovedDuration(request.approvedDuration);
-		appointments.setAppointmentBy(request.getAppointmentBy());
-		appointments.setAppointmentWith(request.getAppointmentWith());
-		appointments.setAnticipatedDuration(request.getAnticipatedDuration());
+        Appointments appointments = new Appointments();
+        appointments.setDate(request.getDate());
+        appointments.setIsOpen(request.getIsOpen());
+        appointments.setComment(request.getComment());
+        appointments.setIsApproaved(request.getIsApproaved());
+        appointments.setApprovedDuration(request.approvedDuration);
+        appointments.setAppointmentBy(request.getAppointmentBy());
+        appointments.setAppointmentWith(request.getAppointmentWith());
+        appointments.setAnticipatedDuration(request.getAnticipatedDuration());
 
-		return appointments;
-	}
+        return appointments;
+    }
 
-	public void update(Appointments updateRequest) {
-		this.setDate(updateRequest.getDate());
-		this.setIsOpen(updateRequest.getIsOpen());
-		this.setComment(updateRequest.getComment());
-		this.setIsApproaved(updateRequest.getIsApproaved());
-		this.setApprovedDuration(updateRequest.getApprovedDuration());
-		this.setAppointmentBy(updateRequest.getAppointmentBy());
-		this.setAppointmentWith(updateRequest.getAppointmentWith());
-		this.setAnticipatedDuration(updateRequest.getAnticipatedDuration());
-	}
+    public void update(Appointments updateRequest) {
+        this.setDate(updateRequest.getDate());
+        this.setIsOpen(updateRequest.getIsOpen());
+        this.setComment(updateRequest.getComment());
+        this.setIsApproaved(updateRequest.getIsApproaved());
+        this.setApprovedDuration(updateRequest.getApprovedDuration());
+        this.setAppointmentBy(updateRequest.getAppointmentBy());
+        this.setAppointmentWith(updateRequest.getAppointmentWith());
+        this.setAnticipatedDuration(updateRequest.getAnticipatedDuration());
+    }
 
-	@Override
-	public String toString() {
-		return "Appointments{" +
-				"id=" + id +
-				", date=" + date +
-				", isOpen=" + isOpen +
-				", comment='" + comment + '\'' +
-				", isApproaved=" + isApproaved +
-				", anticipatedDuration=" + anticipatedDuration +
-				", appointmentWith=" + appointmentWith +
-				", appointmentBy=" + appointmentBy +
-				'}';
-	}
+    @Override
+    public String toString() {
+        return "Appointments{" +
+                "id=" + id +
+                ", date=" + date +
+                ", isOpen=" + isOpen +
+                ", comment='" + comment + '\'' +
+                ", isApproaved=" + isApproaved +
+                ", anticipatedDuration=" + anticipatedDuration +
+                ", appointmentWith=" + appointmentWith +
+                ", appointmentBy=" + appointmentBy +
+                '}';
+    }
 }

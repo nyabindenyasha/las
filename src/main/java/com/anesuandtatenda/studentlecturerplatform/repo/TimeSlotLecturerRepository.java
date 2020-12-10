@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface TimeSlotLecturerRepository extends BaseRepository<TimeSlotLecturer> {
 
-    List<TimeSlotLecturer> findByDayOfWeek(int dayOfWeek);
+    List<TimeSlotLecturer> findByDayOfWeek(long dayOfWeek);
 
-    List<TimeSlotLecturer> findByAccountId(long id);
+    List<TimeSlotLecturer> findByLecturerId(long id);
 
-    List<TimeSlotLecturer> findByDayOfWeekAndAccountId(int dayOfWeek, long id);
+    List<TimeSlotLecturer> findByDayOfWeekAndLecturerId(long dayOfWeek, long id);
 
-  //  TimeSlotLecturer findByDayOfWeekAndAccountIdAAndTimeSlotsId(int dayOfWeek, long id, long timeSlotId);
+  //  TimeSlotLecturer findByDayOfWeekAndAccountIdAAndTimeSlotsId(long dayOfWeek, long id, long timeSlotId);
 }

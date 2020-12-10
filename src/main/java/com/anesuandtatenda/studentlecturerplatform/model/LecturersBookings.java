@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
@@ -12,11 +13,11 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "lecturers_bookings")
-public class LecturersBookings {
+public class LecturersBookings implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY )
     @Column(name = "id")
     private long id;
 
@@ -32,18 +33,22 @@ public class LecturersBookings {
     private boolean isApproaved = true;
 
     @Column(name = "approved_duration")
-    private int approvedDuration;
+    private long approvedDuration;
 
     @Column(name = "approaved_end_time")
     private LocalTime approavedEndTime;
 
-    @JoinColumn(name = "appointment_with", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private Account appointmentWith;
+//    @JoinColumn(name = "appointment_with", referencedColumnName = "id")
+//    @ManyToOne(optional = false)
+//    private Account appointmentWith;
 
-    @JoinColumn(name = "lecturer_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private Account lecturer;
+    private long appointmentWith;
+
+//    @JoinColumn(name = "lecturer_id", referencedColumnName = "id")
+//    @ManyToOne(optional = false)
+//    private Account lecturer;
+
+    private long lecturer;
 
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     @OneToOne(optional = false)

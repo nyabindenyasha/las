@@ -9,8 +9,8 @@ public interface LecturersBookingsRepository extends BaseRepository<LecturersBoo
 
     List<LecturersBookings> findByDate(LocalDate date);
 
-    List<LecturersBookings> findByLecturerId(long id);
+    List<LecturersBookings> findByLecturer(long id);
 
-    List<LecturersBookings> findByDateAndLecturerId(LocalDate date, long id);
+    List<LecturersBookings> findByDateAndLecturer(LocalDate date, long id);
 
 }

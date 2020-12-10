@@ -59,12 +59,12 @@ public class LecturersBookingsServiceImpl extends BaseServiceImpl<LecturersBooki
 
     @Override
     public List<LecturersBookings> findBylecturerId(long id) {
-        return lecturersBookingsRepository.findByLecturerId(id);
+        return lecturersBookingsRepository.findByLecturer(id);
     }
 
     @Override
     public List<LecturersBookings> findByDateAndLecturerId(LocalDate date, long id) {
-        return lecturersBookingsRepository.findByDateAndLecturerId(date, id);
+        return lecturersBookingsRepository.findByDateAndLecturer(date, id);
     }
 
 

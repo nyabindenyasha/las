@@ -3,6 +3,7 @@ package com.anesuandtatenda.studentlecturerplatform.service;
 import com.anesuandtatenda.studentlecturerplatform.local.exceptions.InvalidRequestException;
 import com.anesuandtatenda.studentlecturerplatform.local.requests.TimeSlotLecturerRequest;
 import com.anesuandtatenda.studentlecturerplatform.model.TimeSlotLecturer;
+import com.anesuandtatenda.studentlecturerplatform.model.enums.Role;
 import com.anesuandtatenda.studentlecturerplatform.repo.TimeSlotLecturerRepository;
 import com.anesuandtatenda.studentlecturerplatform.repo.TimeSlotRepository;
 import com.anesuandtatenda.studentlecturerplatform.repo.UserAccountRepository;
@@ -37,22 +38,27 @@ public class TimeSlotLecturerServiceImpl extends BaseServiceImpl<TimeSlotLecture
     @Override
     public TimeSlotLecturer create(TimeSlotLecturerRequest request) {
 
+        System.out.println(request);
+
         TimeSlotLecturer timeSlotLecturer = new TimeSlotLecturer();
 
-        timeSlotLecturer.setAccount(userAccountRepository.getOne(request.getLecturerId()));
+        if (userAccountRepository.getOne(request.getLecturerId()).getRole() != Role.LECTURER)
+            throw new InvalidRequestException("A valid lecturer's account must be provided!");
 
-        timeSlotLecturer.setTimeSlots(timeSlotRepository.getOne(request.getTimeSlotId()));
+        timeSlotLecturer.setLecturerId(request.getLecturerId());
 
-        List<TimeSlotLecturer> alreadyExisting = timeSlotLecturerRepository.findByDayOfWeekAndAccountId(request.getDayOfWeek(), request.getLecturerId());
+        timeSlotLecturer.setTimeSlotId(request.getTimeSlotId());
+
+        List<TimeSlotLecturer> alreadyExisting = timeSlotLecturerRepository.findByDayOfWeekAndLecturerId(request.getDayOfWeek(), request.getLecturerId());
 
         timeSlotLecturer.setDayOfWeek(request.getDayOfWeek());
 
-        if(alreadyExisting.stream().anyMatch(timeSlotLecturerAlreadyExisting -> {
-          return timeSlotLecturerAlreadyExisting.getTimeSlots().getId() == request.getTimeSlotId();
+        if (alreadyExisting.stream().anyMatch(timeSlotLecturerAlreadyExisting -> {
+            return timeSlotLecturerAlreadyExisting.getTimeSlotId() == request.getTimeSlotId();
         }))
             throw new InvalidRequestException("Lecturer already added to that time slot");
         else
-           return timeSlotLecturerRepository.save(timeSlotLecturer);
+            return timeSlotLecturerRepository.save(timeSlotLecturer);
     }
 
 
@@ -71,22 +77,22 @@ public class TimeSlotLecturerServiceImpl extends BaseServiceImpl<TimeSlotLecture
     }
 
     @Override
-    public List<TimeSlotLecturer> findByDayOfWeek(int dayOfWeek) {
+    public List<TimeSlotLecturer> findByDayOfWeek(long dayOfWeek) {
         return timeSlotLecturerRepository.findByDayOfWeek(dayOfWeek);
     }
 
     @Override
     public List<TimeSlotLecturer> findByAccountId(long id) {
-        return timeSlotLecturerRepository.findByAccountId(id);
+        return timeSlotLecturerRepository.findByLecturerId(id);
     }
 
     @Override
-    public List<TimeSlotLecturer> findByDayOfWeekAndAccountId(int dayOfWeek, long id) {
-        return timeSlotLecturerRepository.findByDayOfWeekAndAccountId(dayOfWeek, id);
+    public List<TimeSlotLecturer> findByDayOfWeekAndAccountId(long dayOfWeek, long id) {
+        return timeSlotLecturerRepository.findByDayOfWeekAndLecturerId(dayOfWeek, id);
     }
 
 //    @Override
-//    public TimeSlotLecturer findByDayOfWeekAndAccountIdAAndTimeSlotsId(int dayOfWeek, long id, long timeSlotId) {
+//    public TimeSlotLecturer findByDayOfWeekAndAccountIdAAndTimeSlotsId(long dayOfWeek, long id, long timeSlotId) {
 //        return timeSlotLecturerRepository.findByDayOfWeekAndAccountIdAAndTimeSlotsId(dayOfWeek, id, timeSlotId);
 //    }
 }

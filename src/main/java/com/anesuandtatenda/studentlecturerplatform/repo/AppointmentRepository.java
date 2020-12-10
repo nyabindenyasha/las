@@ -6,8 +6,8 @@ import java.util.Collection;
 
 public interface AppointmentRepository extends BaseRepository<Appointments> {
 
-    Collection<Appointments> findByAppointmentWithId(long id);
+    Collection<Appointments> findByAppointmentWith(long id);
 
-    Collection<Appointments> findByAppointmentById(long id);
+    Collection<Appointments> findByAppointmentBy(long id);
 
 }

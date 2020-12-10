@@ -2,7 +2,6 @@ package com.anesuandtatenda.studentlecturerplatform.service;
 
 import com.anesuandtatenda.studentlecturerplatform.local.exceptions.InvalidRequestException;
 import com.anesuandtatenda.studentlecturerplatform.model.Account;
-import com.anesuandtatenda.studentlecturerplatform.model.Programs;
 import com.anesuandtatenda.studentlecturerplatform.model.enums.Role;
 import com.anesuandtatenda.studentlecturerplatform.repo.ProgramRepository;
 import com.anesuandtatenda.studentlecturerplatform.repo.UserAccountRepository;
@@ -12,10 +11,7 @@ import lombok.val;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Optional;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 
@@ -40,21 +36,13 @@ class UserAccountServiceImpl extends BaseServiceImpl<Account, AccountRequest, Ac
     @Override
     public Account create(AccountRequest request) {
 
-        Optional<Programs> program = programRepository.findById(request.getProgramId());
-
-        Programs programs = program.get();
-
-        if(programs == null)
-            programs = new Programs();
-
-        Collection<Programs> programsCollection = new ArrayList<>();
-        programsCollection.add(programs);
-
         if (request.getRole() == Role.STUDENT && request.getYear() < 1)
             throw new InvalidRequestException("Year of study is required.");
 
+        if (request.getRole() == Role.STUDENT && request.getProgramId() < 1)
+            throw new InvalidRequestException("Program is of study is required.");
+
         Account userAccount = Account.fromCommand(request);
-        userAccount.setProgram(programsCollection);
 
         boolean detailsExist = userAccountRepository.existsByRegNumber(request.getRegNumber());
 

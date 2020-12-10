@@ -21,25 +21,28 @@ import java.util.List;
 @Service
 public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, AppointmentRequest, AppointmentRequest> implements AppointmentService {
 
-     final AppointmentRepository appointmentRepository;
+    final AppointmentRepository appointmentRepository;
 
-     final UserAccountRepository userAccountRepository;
+    final UserAccountRepository userAccountRepository;
 
-     final LecturersBookingsRepository lecturersBookingsRepository;
+    final LecturersBookingsRepository lecturersBookingsRepository;
 
-     final TimeSlotRepository timeSlotRepository;
+    final TimeSlotRepository timeSlotRepository;
 
-     final TimeSlotLecturerRepository timeSlotLecturerRepository;
+    final TimeSlotLecturerRepository timeSlotLecturerRepository;
+
+    final SpacesRepository spacesRepository;
 
     public AppointmentServiceImpl(AppointmentRepository appointmentRepository, UserAccountRepository userAccountRepository,
                                   LecturersBookingsRepository lecturersBookingsRepository, TimeSlotRepository timeSlotRepository,
-                                  TimeSlotLecturerRepository timeSlotLecturerRepository) {
+                                  TimeSlotLecturerRepository timeSlotLecturerRepository, SpacesRepository spacesRepository) {
         super(appointmentRepository);
         this.appointmentRepository = appointmentRepository;
         this.userAccountRepository = userAccountRepository;
         this.lecturersBookingsRepository = lecturersBookingsRepository;
         this.timeSlotRepository = timeSlotRepository;
         this.timeSlotLecturerRepository = timeSlotLecturerRepository;
+        this.spacesRepository = spacesRepository;
     }
 
 
@@ -63,15 +66,15 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
         Appointments appointment = new Appointments();
 
-        appointment.setAppointmentBy(appointmentBy);
+        appointment.setAppointmentBy(appointmentBy.getId());
 
-        appointment.setAppointmentWith(appointmentWith);
+        appointment.setAppointmentWith(appointmentWith.getId());
 
         appointment.setAnticipatedDuration(request.getAnticipatedDuration());
 
         appointment.setDate(request.getDate());
 
-    //    appointment.fromCommand(appointment);
+        //    appointment.fromCommand(appointment);
 
         Appointments validateAppointmentBookingResult = validateAppointmentBooking(appointment);
 
@@ -99,9 +102,9 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
         Appointments appointment = new Appointments();
 
-        appointment.setAppointmentBy(appointmentBy);
+        appointment.setAppointmentBy(appointmentBy.getId());
 
-        appointment.setAppointmentWith(appointmentWith);
+        appointment.setAppointmentWith(appointmentWith.getId());
 
         appointment.setAnticipatedDuration(request.getAnticipatedDuration());
 
@@ -116,12 +119,12 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
     @Override
     public Collection<Appointments> findByAppointmentWithId(long id) {
-        return appointmentRepository.findByAppointmentWithId(id);
+        return appointmentRepository.findByAppointmentWith(id);
     }
 
     @Override
     public Collection<Appointments> findByAppointmentById(long id) {
-        return appointmentRepository.findByAppointmentById(id);
+        return appointmentRepository.findByAppointmentBy(id);
     }
 
     @Override
@@ -136,7 +139,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
         Appointments appointment = findById(request.getAppointmentId());
 
-      //  LecturersBookings lecturerBooking = lecturersBookingsRepository.findByDateAndLecturerId(appointment.getDate(), )
+        //  LecturersBookings lecturerBooking = lecturersBookingsRepository.findByDateAndLecturerId(appointment.getDate(), )
 
         boolean lecturerDetailsExists = lecturersBookingsRepository.existsById(request.getLecturerBookingId());
 
@@ -149,19 +152,19 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
             throw new InvalidRequestException("Appointment not found");
         }
 
-    //    LecturersBookings booking = lecturersBookingsRepository.findById(request.getLecturerBookingId()).get();
+        //    LecturersBookings booking = lecturersBookingsRepository.findById(request.getLecturerBookingId()).get();
 
-        Account student = userAccountRepository.getOne(appointment.getAppointmentBy().getId());
+        Account student = userAccountRepository.getOne(appointment.getAppointmentBy());
 
         Account lecturer = userAccountRepository.getOne(request.getLecturerId());
 
-        if(request.isApproved()) {
+        if (request.isApproved()) {
 
             appointment.setIsApproaved(true);
 
-  //          booking.setApproaved(true);
+            //          booking.setApproaved(true);
 
-  //          lecturersBookingsRepository.save(booking);
+            //          lecturersBookingsRepository.save(booking);
         }
 
         appointment.setIsApproaved(true);
@@ -183,27 +186,38 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
         }
     }
 
-    Appointments validateAppointmentBooking(Appointments appointment){
+    Appointments validateAppointmentBooking(Appointments appointment) {
 
         System.out.println(Utils.convertToLocalTime(appointment.getDate()));
 
-        List<LecturersBookings> lecturersBookings = lecturersBookingsRepository.findByDateAndLecturerId(Utils.convertToLocalDate(appointment.getDate()), appointment.getAppointmentWith().getId());
+        List<LecturersBookings> lecturersBookings = lecturersBookingsRepository.findByDateAndLecturer(Utils.convertToLocalDate(appointment.getDate()), appointment.getAppointmentWith());
 
-        if(lecturersBookings.size() > 1){
-            LecturersBookings lastBookingForThatDay = lecturersBookings.get(lecturersBookings.size()-1);
+        String spaceStartTime = Utils.convertToLocalTime(appointment.getDate()).toString();
+        String spaceEndTime = Utils.convertToLocalTime(appointment.getDate()).plusMinutes(appointment.getAnticipatedDuration()).toString();
 
-            int dayOfWeek = Utils.convertToLocalDate(appointment.getDate()).getDayOfWeek().getValue();
+        if (lecturersBookings.size() > 1) {
+            LecturersBookings lastBookingForThatDay = lecturersBookings.get(lecturersBookings.size() - 1);
 
-            TimeSlots freeTimeSlotForLecturerOnThatDay = timeSlotLecturerRepository.findByDayOfWeekAndAccountId(dayOfWeek, appointment.getAppointmentWith().getId()).get(0).getTimeSlots();
+            long dayOfWeek = Utils.convertToLocalDate(appointment.getDate()).getDayOfWeek().getValue();
+
+            long timeSlotsId = timeSlotLecturerRepository.findByDayOfWeekAndLecturerId(dayOfWeek, appointment.getAppointmentWith()).get(0).getTimeSlotId();
+
+            TimeSlots freeTimeSlotForLecturerOnThatDay = timeSlotRepository.getOne(timeSlotsId);
 
             LocalTime endTimeOfLastBookingForThatDay = lastBookingForThatDay.getApproavedEndTime();
 
-            if(endTimeOfLastBookingForThatDay.plusMinutes(appointment.getAnticipatedDuration()).isBefore(freeTimeSlotForLecturerOnThatDay.getEndTime())){
+            if (endTimeOfLastBookingForThatDay.plusMinutes(appointment.getAnticipatedDuration()).isBefore(freeTimeSlotForLecturerOnThatDay.getEndTime())) {
 
                 appointment.setIsApproaved(false);
                 appointment.setApprovedDuration(appointment.getAnticipatedDuration());
 
                 Appointments appointmentSaved = appointmentRepository.save(appointment);
+
+                Spaces spaces = new Spaces();
+                spaces.setStartTime(spaceStartTime);
+                spaces.setEndTime(spaceEndTime);
+                spaces.setLecturerId(appointment.getAppointmentWith());
+                spacesRepository.save(spaces);
 
                 LecturersBookings lecturersBooking = new LecturersBookings();
                 lecturersBooking.setTimeslot(freeTimeSlotForLecturerOnThatDay);
@@ -217,36 +231,42 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
                 lecturersBookingsRepository.save(lecturersBooking);
                 return appointmentSaved;
-            }
-
-            else
+            } else
                 throw new AppointmentBookingFailedException(ValidateAppointmentResponses.Response1.getAppointmentResponse());
-        }
+        } else {
 
-        else {
+            long dayOfWeek = Utils.convertToLocalDate(appointment.getDate()).getDayOfWeek().getValue();
 
-            int dayOfWeek = Utils.convertToLocalDate(appointment.getDate()).getDayOfWeek().getValue();
+            List<TimeSlotLecturer> timeSlotLecturers = timeSlotLecturerRepository.findByDayOfWeekAndLecturerId(dayOfWeek, appointment.getAppointmentWith());
 
-            List<TimeSlotLecturer> timeSlotLecturers = timeSlotLecturerRepository.findByDayOfWeekAndAccountId(dayOfWeek, appointment.getAppointmentWith().getId());
-
-            if(timeSlotLecturers.size() == 0)
+            if (timeSlotLecturers.size() == 0)
                 throw new AppointmentBookingFailedException(ValidateAppointmentResponses.Response2.getAppointmentResponse());
 
             else {
-                TimeSlots freeTimeSlotForLecturerOnThatDay = timeSlotLecturers.get(0).getTimeSlots();
+                TimeSlots freeTimeSlotForLecturerOnThatDay = timeSlotRepository.getOne(timeSlotLecturers.get(0).getTimeSlotId());
 
                 System.out.println("xxx");
 
                 System.out.println(freeTimeSlotForLecturerOnThatDay);
 
+                LocalTime time = Utils.convertToLocalTime(appointment.getDate());
+
+                TimeSlots tm = evaluateTimeSlotByTime(Utils.convertToLocalTime(appointment.getDate()));
+
                 System.out.println(evaluateTimeSlotByTime(Utils.convertToLocalTime(appointment.getDate())));
 
-                if(freeTimeSlotForLecturerOnThatDay.getId() == evaluateTimeSlotByTime(Utils.convertToLocalTime(appointment.getDate())).getId()){
+                if (freeTimeSlotForLecturerOnThatDay.getId() == evaluateTimeSlotByTime(Utils.convertToLocalTime(appointment.getDate())).getId()) {
 
                     appointment.setIsApproaved(false);
                     appointment.setApprovedDuration(appointment.getAnticipatedDuration());
 
                     Appointments appointmentSaved = appointmentRepository.save(appointment);
+
+                    Spaces spaces = new Spaces();
+                    spaces.setStartTime(spaceStartTime);
+                    spaces.setEndTime(spaceEndTime);
+                    spaces.setLecturerId(appointment.getAppointmentWith());
+                    spacesRepository.save(spaces);
 
                     LecturersBookings lecturersBooking = new LecturersBookings();
                     lecturersBooking.setTimeslot(freeTimeSlotForLecturerOnThatDay);
@@ -260,8 +280,7 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
                     lecturersBookingsRepository.save(lecturersBooking);
                     return appointmentSaved;
-                }
-                else
+                } else
                     throw new AppointmentBookingFailedException(ValidateAppointmentResponses.Response3.getAppointmentResponse());
             }
 
@@ -269,19 +288,45 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
     }
 
 
-    TimeSlots evaluateTimeSlotByTime(LocalTime time){
+//    Appointments validateAppointmentTheOne(Appointments appointment){
+//        Spaces spaces = new Spaces();
+//        spaces.setStartTime(Utils.convertToLocalDate(appointment.getDate()).toString());
+//        spaces.setEndTime((Utils.convertToLocalDate(appointment.getDate())).plusMinutes(appointment.getAnticipatedDuration()).toString());
+//
+//        Appointments appointmentSaved = appointmentRepository.save(appointment);
+//
+//        LecturersBookings lecturersBooking = new LecturersBookings();
+//        lecturersBooking.setTimeslot(freeTimeSlotForLecturerOnThatDay);
+//        lecturersBooking.setApproaved(false);      //still waiting for lecturer's approval
+//        lecturersBooking.setAppointment(appointmentSaved);
+//        lecturersBooking.setDate(Utils.convertToLocalDate(appointment.getDate()));
+//        lecturersBooking.setApprovedDuration(appointment.getAnticipatedDuration());
+//        lecturersBooking.setAppointmentWith(appointment.getAppointmentBy());
+//        lecturersBooking.setApproavedEndTime(freeTimeSlotForLecturerOnThatDay.getStartTime().plusMinutes(appointment.getAnticipatedDuration()));
+//        lecturersBooking.setLecturer(appointment.getAppointmentWith());
+//
+//        lecturersBookingsRepository.save(lecturersBooking);
+//        return appointmentSaved;
+//    }
+
+
+    TimeSlots evaluateTimeSlotByTime(LocalTime time) {
+
+        Collection<TimeSlots> all = timeSlotRepository.findAll();
 
         System.out.println(timeSlotRepository.findAll());
 
-        if(time.isAfter(LocalTime.parse("08:00")) && time.isBefore(LocalTime.parse("10:00")))
-         //   return timeSlotRepository.findByStartTime(LocalTime.parse("08:00"));
-            return timeSlotRepository.findByStartTime(LocalTime.parse("08:00"));
-
-        else if(time.isAfter(LocalTime.parse("10:15")) && time.isBefore(LocalTime.parse("12:15")))
-          //  return timeSlotRepository.findByStartTime(LocalTime.parse("10:15"));
+        if (time.isAfter(LocalTime.parse("08:00")) && time.isBefore(LocalTime.parse("10:00"))) {
+            System.out.println(((List<TimeSlots>) all).get(0));
+            TimeSlots t = all.parallelStream().findFirst().get();
+            return t;
+//            TimeSlots t = timeSlotRepository.findByStartTime(LocalTime.parse("08:00"));
+//            return timeSlotRepository.findByStartTime(LocalTime.parse("08:00"));
+        } else if (time.isAfter(LocalTime.parse("10:15")) && time.isBefore(LocalTime.parse("12:15")))
+            //  return timeSlotRepository.findByStartTime(LocalTime.parse("10:15"));
             return timeSlotRepository.findByStartTime(LocalTime.parse("10:15"));
 
-        else if(time.isAfter(LocalTime.parse("13:00")) && time.isBefore(LocalTime.parse("15:00")))
+        else if (time.isAfter(LocalTime.parse("13:00")) && time.isBefore(LocalTime.parse("15:00")))
 //            return timeSlotRepository.findByStartTime(LocalTime.parse("13:00"));
             return timeSlotRepository.findByStartTime(LocalTime.parse("13:00"));
 

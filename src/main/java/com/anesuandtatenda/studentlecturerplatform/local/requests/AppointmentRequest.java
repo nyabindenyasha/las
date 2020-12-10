@@ -21,7 +21,7 @@ public class AppointmentRequest {
 
     private boolean isApproaved;
 
-    private int anticipatedDuration;
+    private long anticipatedDuration;
 
     private long appointmentWith;
 

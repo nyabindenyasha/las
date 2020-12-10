@@ -94,7 +94,7 @@ public class FacaultyController {
     public ResponseEntity<?> update(@RequestBody Facaulty request, @PathVariable long facaultyId) {
         try {
             if(request.getId() != facaultyId){
-                throw new InvalidRequestException("You can not delete this record as it might be used by another record");
+                throw new InvalidRequestException("Facaulty with specified Id not found");
             }
             Facaulty facaultyUpdated = facaultyService.update(request);
             return new ResponseEntity<Facaulty>(facaultyUpdated, HttpStatus.OK);

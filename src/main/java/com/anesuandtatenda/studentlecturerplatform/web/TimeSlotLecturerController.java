@@ -46,17 +46,13 @@ public class TimeSlotLecturerController {
             TimeSlotLecturer timeSlotLecturerCreated = timeSlotLecturerService.create(timeSlotLecturer);
             return new ResponseEntity<TimeSlotLecturer>(timeSlotLecturerCreated, HttpStatus.OK);
         } catch (Exception e){
-//            if(e instanceof InvalidDefinitionException)
-//                System.out.println("InvalidDefinitionException");
-//            if(e instanceof com.fasterxml.jackson.databind.exc.InvalidDefinitionException)
-//                System.out.println("com.fasterxml.jackson.databind.exc.InvalidDefinitionException");
-            return new ResponseEntity<>(new ResponseMessage("successfully added"), HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/findby-day-of-week/all")
     @ApiOperation("Get All Lecturers Timeslots by Day of Week")
-    public ResponseEntity<?> getAllByDayOfWeek(int dayOfWeek) {
+    public ResponseEntity<?> getAllByDayOfWeek(long dayOfWeek) {
         try {
             Collection<TimeSlotLecturer> timeSlotLecturers = timeSlotLecturerService.findByDayOfWeek(dayOfWeek);
             return new ResponseEntity<Collection<TimeSlotLecturer>>(timeSlotLecturers, HttpStatus.OK);
@@ -82,7 +78,7 @@ public class TimeSlotLecturerController {
 
     @GetMapping("/findbylecturerid/dayofweek/all")
     @ApiOperation("Get All Lecturers Timeslots by Day Of Week and LecturerId")
-    public ResponseEntity<?> getAllByDateAndLecturerId(int dayOfWeek, long id) {
+    public ResponseEntity<?> getAllByDateAndLecturerId(long dayOfWeek, long id) {
         try {
             Collection<TimeSlotLecturer> timeSlotLecturers = timeSlotLecturerService.findByDayOfWeekAndAccountId(dayOfWeek, id);
             return new ResponseEntity<Collection<TimeSlotLecturer>>(timeSlotLecturers, HttpStatus.OK);
@@ -97,7 +93,7 @@ public class TimeSlotLecturerController {
     public ResponseEntity<?> getAllByDateAndLecturerId(String date, long id) {
         try {
             LocalDate localDate = LocalDate.parse(date);
-            int dayOfWeek = localDate.getDayOfWeek().getValue();
+            long dayOfWeek = localDate.getDayOfWeek().getValue();
             Collection<TimeSlotLecturer> timeSlotLecturers = timeSlotLecturerService.findByDayOfWeekAndAccountId(dayOfWeek, id);
             return new ResponseEntity<Collection<TimeSlotLecturer>>(timeSlotLecturers, HttpStatus.OK);
         }

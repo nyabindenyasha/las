@@ -20,7 +20,7 @@ public class Account implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY )
 	@Column(name = "id")
 	private long id;
 
@@ -40,14 +40,17 @@ public class Account implements Serializable {
 	private String username;
 
 	@Column(name = "year")
-	private int year;
+	private long year;
 
 	@Size(max = 50)
 	@Column(name = "reg_number",unique = true)
 	private String regNumber;
 
+	@Transient
 	@ManyToOne
 	private Programs program;
+
+	private long programId;
 
 	@Enumerated(EnumType.ORDINAL)
 	private Role role;
@@ -93,11 +96,11 @@ public class Account implements Serializable {
 		this.lastName = lastName;
 	}
 
-	public int getYear() {
+	public long getYear() {
 		return year;
 	}
 
-	public void setYear(int year) {
+	public void setYear(long year) {
 		this.year = year;
 	}
 
@@ -109,12 +112,20 @@ public class Account implements Serializable {
 		this.regNumber = regNumber;
 	}
 
-	public Programs getProgram() {
-		return program;
+//	public Programs getProgram() {
+//		return program;
+//	}
+//
+//	public void setProgram(Programs program) {
+//		this.program = program;
+//	}
+
+	public long getProgramId() {
+		return programId;
 	}
 
-	public void setProgram(Programs program) {
-		this.program = program;
+	public void setProgramId(long programId) {
+		this.programId = programId;
 	}
 
 	public Role getRole() {
@@ -151,6 +162,8 @@ public class Account implements Serializable {
 		account.setFirstName(request.getFirstName());
 		account.setLastName(request.getLastName());
 		account.setUsername("xxx");
+		account.setRegNumber(request.getRegNumber());
+		account.setProgramId(request.getProgramId());
 		account.setYear(request.getYear());
 		account.setPassword(request.getPassword());
 		account.setRole(request.getRole());
@@ -164,7 +177,7 @@ public class Account implements Serializable {
 		this.setUsername(updateRequest.getUsername());
 		this.setRegNumber(updateRequest.getRegNumber());
 		this.setYear(updateRequest.getYear());
-		this.setProgram(updateRequest.getProgram());
+		this.setProgramId(updateRequest.getProgramId());
 		this.setRole(updateRequest.getRole());
 	}
 

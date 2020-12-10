@@ -1,5 +1,7 @@
 package com.anesuandtatenda.studentlecturerplatform.model;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -7,73 +9,23 @@ import java.io.Serializable;
  *
  * @author GustTech
  */
+@Data
 @Entity
 @Table(name = "time_slot_lecturer")
 public class TimeSlotLecturer implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private long id;
 
 	@Column(name = "day_of_week")
-	private int dayOfWeek;
+	private long dayOfWeek;
 
-	@JoinColumn(name = "account_id", referencedColumnName = "id")
-	@ManyToOne(optional = false)
-	private Account account;
+	private long lecturerId;
 
-	@JoinColumn(name = "time_slot_id", referencedColumnName = "id")
-	@ManyToOne(optional = false)
-	private TimeSlots timeSlots;
+	@Column(name = "time_slots_id")
+	private long timeSlotId;
 
-	public TimeSlotLecturer() {
-	}
-
-	public TimeSlotLecturer(Integer id) {
-		this.id = id;
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public int getDayOfWeek() {
-		return dayOfWeek;
-	}
-
-	public void setDayOfWeek(int dayOfWeek) {
-		this.dayOfWeek = dayOfWeek;
-	}
-
-	public Account getAccount() {
-		return account;
-	}
-
-	public void setAccount(Account account) {
-		this.account = account;
-	}
-
-	public TimeSlots getTimeSlots() {
-		return timeSlots;
-	}
-
-	public void setTimeSlots(TimeSlots timeSlots) {
-		this.timeSlots = timeSlots;
-	}
-
-	@Override
-	public String toString() {
-		return "TimeSlotLecturer{" +
-				"id=" + id +
-				"dayOfWeek=" + dayOfWeek +
-				", account=" + account +
-				", timeSlots=" + timeSlots +
-				'}';
-	}
 }

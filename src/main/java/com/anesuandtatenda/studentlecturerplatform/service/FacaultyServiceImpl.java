@@ -41,12 +41,6 @@ class FacaultyServiceImpl extends BaseServiceImpl<Facaulty, Facaulty, Facaulty> 
     @Override
     public Facaulty update(Facaulty request) {
 
-        boolean detailsExists = facaultyRepository.existsByName(request.getName());
-
-        if (!detailsExists) {
-            throw new InvalidRequestException("Facaulty not found");
-        }
-
         Facaulty facaulty = findById(request.getId());
 
         facaulty.update(request);

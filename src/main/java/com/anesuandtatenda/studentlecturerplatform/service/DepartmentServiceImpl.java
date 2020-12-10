@@ -51,12 +51,6 @@ class DepartmentServiceImpl extends BaseServiceImpl<Department, DepartmentReques
     @Override
     public Department update(DepartmentUpdateRequest request) {
 
-        boolean detailsExists = departmentRepository.existsByName(request.getName());
-
-        if (!detailsExists) {
-            throw new InvalidRequestException("Department not found");
-        }
-
         Department department = findById(request.getId());
 
         Optional<Facaulty> facaulty = facaultyRepository.findById(request.getFacaultlyId());
