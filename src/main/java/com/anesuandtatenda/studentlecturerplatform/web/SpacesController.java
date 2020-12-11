@@ -63,7 +63,7 @@ public class SpacesController {
 
     @GetMapping("/evaluateByLecturerId/{lecturerId}/{dayOfWeek}")
     @ApiOperation("Get All Spaces")
-    public ResponseEntity<?> evaluateByLecturerId(@PathVariable long lecturerId, int dayOfWeek) {
+    public ResponseEntity<?> evaluateByLecturerId(@PathVariable long lecturerId, @PathVariable int dayOfWeek) {
         try {
             Collection<Spaces> facaulties = spacesService.evaluateByLecturerId(lecturerId, dayOfWeek);
             return new ResponseEntity<Collection<Spaces>>(facaulties, HttpStatus.OK);

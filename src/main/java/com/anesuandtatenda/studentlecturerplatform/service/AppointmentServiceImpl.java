@@ -192,8 +192,10 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
         List<LecturersBookings> lecturersBookings = lecturersBookingsRepository.findByDateAndLecturer(Utils.convertToLocalDate(appointment.getDate()), appointment.getAppointmentWith());
 
-        String spaceStartTime = Utils.convertToLocalTime(appointment.getDate()).toString();
-        String spaceEndTime = Utils.convertToLocalTime(appointment.getDate()).plusMinutes(appointment.getAnticipatedDuration()).toString();
+        System.out.println(lecturersBookings);
+
+//        String spaceStartTime = Utils.convertToLocalTime(appointment.getDate()).toString();
+//        String spaceEndTime = Utils.convertToLocalTime(appointment.getDate()).plusMinutes(appointment.getAnticipatedDuration()).toString();
 
         if (lecturersBookings.size() > 1) {
             LecturersBookings lastBookingForThatDay = lecturersBookings.get(lecturersBookings.size() - 1);
@@ -213,11 +215,11 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
                 Appointments appointmentSaved = appointmentRepository.save(appointment);
 
-                Spaces spaces = new Spaces();
-                spaces.setStartTime(spaceStartTime);
-                spaces.setEndTime(spaceEndTime);
-                spaces.setLecturerId(appointment.getAppointmentWith());
-                spacesRepository.save(spaces);
+//                Spaces spaces = new Spaces();
+//                spaces.setStartTime(spaceStartTime);
+//                spaces.setEndTime(spaceEndTime);
+//                spaces.setLecturerId(appointment.getAppointmentWith());
+//                spacesRepository.save(spaces);
 
                 LecturersBookings lecturersBooking = new LecturersBookings();
                 lecturersBooking.setTimeslot(freeTimeSlotForLecturerOnThatDay);
@@ -262,11 +264,11 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
                     Appointments appointmentSaved = appointmentRepository.save(appointment);
 
-                    Spaces spaces = new Spaces();
-                    spaces.setStartTime(spaceStartTime);
-                    spaces.setEndTime(spaceEndTime);
-                    spaces.setLecturerId(appointment.getAppointmentWith());
-                    spacesRepository.save(spaces);
+//                    Spaces spaces = new Spaces();
+//                    spaces.setStartTime(spaceStartTime);
+//                    spaces.setEndTime(spaceEndTime);
+//                    spaces.setLecturerId(appointment.getAppointmentWith());
+//                    spacesRepository.save(spaces);
 
                     LecturersBookings lecturersBooking = new LecturersBookings();
                     lecturersBooking.setTimeslot(freeTimeSlotForLecturerOnThatDay);

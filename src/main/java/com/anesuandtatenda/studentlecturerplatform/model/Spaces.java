@@ -28,4 +28,10 @@ public class Spaces {
     @Column(name = "lecturer_id")
     private long lecturerId;
 
+    @Transient
+    private String result;
+
+    @Transient
+    private String color;
+
 }
