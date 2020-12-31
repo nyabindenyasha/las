@@ -6,4 +6,5 @@ public interface ProgramRepository extends BaseRepository<Programs> {
 
     boolean existsByName(String name);
 
+    Programs getByName(String name);
 }

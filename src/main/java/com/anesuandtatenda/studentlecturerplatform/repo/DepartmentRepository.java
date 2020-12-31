@@ -7,4 +7,5 @@ public interface DepartmentRepository extends BaseRepository<Department> {
 
     boolean existsByName(String name);
 
+    Department getByName(String name);
 }

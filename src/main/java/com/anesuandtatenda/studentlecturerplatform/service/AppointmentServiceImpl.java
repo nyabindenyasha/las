@@ -60,9 +60,9 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
             throw new InvalidRequestException("Appointment with the same name already exists");
         }
 
-        Account appointmentBy = userAccountRepository.getOne(request.getAppointmentBy());
+        UserAccount appointmentBy = userAccountRepository.getOne(request.getAppointmentBy());
 
-        Account appointmentWith = userAccountRepository.getOne(request.getAppointmentWith());
+        UserAccount appointmentWith = userAccountRepository.getOne(request.getAppointmentWith());
 
         Appointments appointment = new Appointments();
 
@@ -96,9 +96,9 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
             throw new InvalidRequestException("Appointment with the same name already exists");
         }
 
-        Account appointmentBy = userAccountRepository.getOne(request.getAppointmentBy());
+        UserAccount appointmentBy = userAccountRepository.getOne(request.getAppointmentBy());
 
-        Account appointmentWith = userAccountRepository.getOne(request.getAppointmentWith());
+        UserAccount appointmentWith = userAccountRepository.getOne(request.getAppointmentWith());
 
         Appointments appointment = new Appointments();
 
@@ -154,9 +154,9 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
         //    LecturersBookings booking = lecturersBookingsRepository.findById(request.getLecturerBookingId()).get();
 
-        Account student = userAccountRepository.getOne(appointment.getAppointmentBy());
+        UserAccount student = userAccountRepository.getOne(appointment.getAppointmentBy());
 
-        Account lecturer = userAccountRepository.getOne(request.getLecturerId());
+        UserAccount lecturer = userAccountRepository.getOne(request.getLecturerId());
 
         if (request.isApproved()) {
 

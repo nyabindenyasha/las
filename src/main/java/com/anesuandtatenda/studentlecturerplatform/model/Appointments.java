@@ -43,13 +43,13 @@ public class Appointments implements Serializable {
 
 //	@JoinColumn(name = "appointment_with", referencedColumnName = "id")
 //	@ManyToOne(optional = false)
-//	private Account appointmentWith;
+//	private UserAccount appointmentWith;
 
     private long appointmentWith;
 
 //	@JoinColumn(name = "appointment_by", referencedColumnName = "id")
 //	@ManyToOne(optional = false)
-//	private Account appointmentBy;
+//	private UserAccount appointmentBy;
 
     private long appointmentBy;
 
@@ -116,19 +116,19 @@ public class Appointments implements Serializable {
         this.anticipatedDuration = anticipatedDuration;
     }
 
-//	public Account getAppointmentWith() {
+//	public UserAccount getAppointmentWith() {
 //		return appointmentWith;
 //	}
 //
-//	public void setAppointmentWith(Account appointmentWith) {
+//	public void setAppointmentWith(UserAccount appointmentWith) {
 //		this.appointmentWith = appointmentWith;
 //	}
 //
-//	public Account getAppointmentBy() {
+//	public UserAccount getAppointmentBy() {
 //		return appointmentBy;
 //	}
 //
-//	public void setAppointmentBy(Account appointmentBy) {
+//	public void setAppointmentBy(UserAccount appointmentBy) {
 //		this.appointmentBy = appointmentBy;
 //	}
 

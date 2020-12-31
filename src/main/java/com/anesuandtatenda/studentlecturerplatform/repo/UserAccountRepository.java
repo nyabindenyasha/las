@@ -1,11 +1,11 @@
 package com.anesuandtatenda.studentlecturerplatform.repo;
 
 
-import com.anesuandtatenda.studentlecturerplatform.model.Account;
+import com.anesuandtatenda.studentlecturerplatform.model.UserAccount;
 
 import java.util.Optional;
 
-public interface UserAccountRepository extends BaseRepository<Account> {
+public interface UserAccountRepository extends BaseRepository<UserAccount> {
 
     boolean existsByUsername(String name);
 
@@ -13,12 +13,12 @@ public interface UserAccountRepository extends BaseRepository<Account> {
 
     boolean existsByRegNumber(String regNumber);
 
-    Account getByUsername(String username);
+    UserAccount getByUsername(String username);
 
-    Account getByRegNumber(String username);
+    UserAccount getByRegNumber(String username);
 
-    Optional<Account> findByUsername(String username);
+    Optional<UserAccount> findByUsername(String username);
 
-    Optional<Account> findByFirstName(String firstName);
+    Optional<UserAccount> findByFirstName(String firstName);
 
 }

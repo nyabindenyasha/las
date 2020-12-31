@@ -2,14 +2,12 @@ package com.anesuandtatenda.studentlecturerplatform.service;
 
 
 import com.anesuandtatenda.studentlecturerplatform.local.exceptions.InvalidRequestException;
-import com.anesuandtatenda.studentlecturerplatform.local.requests.DepartmentCreateRequest;
 import com.anesuandtatenda.studentlecturerplatform.local.requests.DepartmentUpdateRequest;
 import com.anesuandtatenda.studentlecturerplatform.model.Department;
 import com.anesuandtatenda.studentlecturerplatform.model.Facaulty;
 import com.anesuandtatenda.studentlecturerplatform.repo.DepartmentRepository;
 import com.anesuandtatenda.studentlecturerplatform.repo.FacaultyRepository;
 import com.anesuandtatenda.studentlecturerplatform.web.requests.DepartmentRequest;
-import lombok.val;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolationException;
@@ -71,5 +69,14 @@ class DepartmentServiceImpl extends BaseServiceImpl<Department, DepartmentReques
         }
     }
 
+    @Override
+    public boolean existsByName(String name) {
+        return departmentRepository.existsByName(name);
+    }
+
+    @Override
+    public Department getByName(String name) {
+        return departmentRepository.getByName(name);
+    }
 }
 

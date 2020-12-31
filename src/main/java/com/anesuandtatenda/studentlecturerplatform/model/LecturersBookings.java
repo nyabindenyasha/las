@@ -8,7 +8,6 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Date;
 
 @Data
 @Entity
@@ -40,13 +39,13 @@ public class LecturersBookings implements Serializable {
 
 //    @JoinColumn(name = "appointment_with", referencedColumnName = "id")
 //    @ManyToOne(optional = false)
-//    private Account appointmentWith;
+//    private UserAccount appointmentWith;
 
     private long appointmentWith;
 
 //    @JoinColumn(name = "lecturer_id", referencedColumnName = "id")
 //    @ManyToOne(optional = false)
-//    private Account lecturer;
+//    private UserAccount lecturer;
 
     private long lecturer;
 

@@ -4,7 +4,7 @@ import com.anesuandtatenda.studentlecturerplatform.model.enums.Role;
 import lombok.Data;
 
 @Data
-public class AccountRequest {
+public class UserAccountRequest {
 
     private String firstName;
     private String lastName;
@@ -13,5 +13,6 @@ public class AccountRequest {
     private long programId;
     private Role role;
     private String password;
+    private String email;
 
 }
