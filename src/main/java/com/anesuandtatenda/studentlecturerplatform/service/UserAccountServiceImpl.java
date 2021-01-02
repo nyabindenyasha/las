@@ -135,7 +135,7 @@ class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, UserAccountReq
     @Override
     public UserAccount findByRegNumberOrFirstname(String username, String firstName) {
 
-        boolean userByUsernameExists = userAccountRepository.existsByUsername(username);
+        boolean userByUsernameExists = userAccountRepository.existsByRegNumber(username);
         boolean userByFirstNameExists = userAccountRepository.existsByFirstName(firstName);
 
         if (userByUsernameExists) {

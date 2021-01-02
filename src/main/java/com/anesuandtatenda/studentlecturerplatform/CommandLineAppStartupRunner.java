@@ -134,14 +134,14 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
             userAccountService.create(lecturerAccountRequest);
         }
 
-        boolean studentExists = userAccountService.existByRegNumber("AD1234M");
+        boolean studentExists = userAccountService.existByRegNumber("ST1234T");
 
         if (!studentExists) {
             UserAccountRequest studentAccountRequest = new UserAccountRequest();
             studentAccountRequest.setFirstName("Tatenda");
             studentAccountRequest.setLastName("Nderema");
             studentAccountRequest.setPassword("student");
-            studentAccountRequest.setRegNumber("AD1234M");
+            studentAccountRequest.setRegNumber("ST1234T");
             studentAccountRequest.setEmail("nyabindenyashae@gmail.com");
             Programs program = programService.getByName("QWAB");
             studentAccountRequest.setProgramId(program.getId());

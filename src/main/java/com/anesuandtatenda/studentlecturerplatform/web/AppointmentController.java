@@ -16,7 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 
 @CrossOrigin
 @RestController
@@ -59,6 +61,20 @@ public class AppointmentController {
         try {
             Appointments appointment = appointmentService.findById(appointmentId);
             return new ResponseEntity<Appointments>(appointment, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/existsByDate/{date}")
+    @ApiOperation("Exists by Date")
+    public ResponseEntity<?> existsByDate(@PathVariable String date) {
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("E,yyyy-MMM-dd HH:mm");
+            Date date1 = formatter.parse(date);
+            System.out.println(date1);
+            boolean appointment = appointmentService.existsByDate(date1);
+            return new ResponseEntity<>(appointment, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }

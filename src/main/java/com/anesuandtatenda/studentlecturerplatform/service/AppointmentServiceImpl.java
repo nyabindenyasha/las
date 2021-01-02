@@ -1,14 +1,15 @@
 package com.anesuandtatenda.studentlecturerplatform.service;
 
+import com.anesuandtatenda.studentlecturerplatform.local.SmtpMailSender;
 import com.anesuandtatenda.studentlecturerplatform.local.Utils;
-import com.anesuandtatenda.studentlecturerplatform.local.exceptions.AppointmentBookingFailedException;
 import com.anesuandtatenda.studentlecturerplatform.local.exceptions.InvalidRequestException;
 import com.anesuandtatenda.studentlecturerplatform.local.requests.AppointmentRequest;
 import com.anesuandtatenda.studentlecturerplatform.local.requests.AppointmentRequestMobile;
 import com.anesuandtatenda.studentlecturerplatform.local.requests.ApproveAppointmentRequest;
 import com.anesuandtatenda.studentlecturerplatform.model.*;
-import com.anesuandtatenda.studentlecturerplatform.model.enums.ValidateAppointmentResponses;
 import com.anesuandtatenda.studentlecturerplatform.repo.*;
+import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolationException;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -32,6 +34,9 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
     final TimeSlotLecturerRepository timeSlotLecturerRepository;
 
     final SpacesRepository spacesRepository;
+
+    @Autowired
+    private SmtpMailSender smtpMailSender;
 
     public AppointmentServiceImpl(AppointmentRepository appointmentRepository, UserAccountRepository userAccountRepository,
                                   LecturersBookingsRepository lecturersBookingsRepository, TimeSlotRepository timeSlotRepository,
@@ -54,10 +59,10 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
     @Override
     public Appointments create(AppointmentRequest request) {
 
-        boolean detailsExists = appointmentRepository.existsById(request.getId());
+        boolean detailsExists = appointmentRepository.existsByDate(request.getDate());
 
         if (detailsExists) {
-            throw new InvalidRequestException("Appointment with the same name already exists");
+            throw new InvalidRequestException("Appointment already created");
         }
 
         UserAccount appointmentBy = userAccountRepository.getOne(request.getAppointmentBy());
@@ -72,7 +77,9 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
         appointment.setAnticipatedDuration(request.getAnticipatedDuration());
 
-        appointment.setDate(request.getDate());
+        Date dateWithHoursSubtracted = Utils.addHoursToJavaUtilDate(request.getDate(), -2);
+
+        appointment.setDate(dateWithHoursSubtracted);
 
         //    appointment.fromCommand(appointment);
 
@@ -128,10 +135,16 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
     }
 
     @Override
+    public boolean existsByDate(Date date) {
+        return appointmentRepository.existsByDate(date);
+    }
+
+    @Override
     public Appointments update(AppointmentRequest updateDto) {
         return null;
     }
 
+    @SneakyThrows
     @Override
     public Appointments approveBooking(ApproveAppointmentRequest request) {
 
@@ -173,6 +186,9 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
         appointmentRepository.save(appointment);
 
+        smtpMailSender.send(student.getEmail(), "Appointment Approval Result", "Hie " + student.getFirstName() + " " + student.getLastName() +
+                " Your appointment with " + lecturer.getFirstName() + " " + lecturer.getLastName() + " has been approved.");
+
         return appointmentRepository.save(appointment);
     }
 
@@ -186,130 +202,43 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
         }
     }
 
+    @SneakyThrows
     Appointments validateAppointmentBooking(Appointments appointment) {
 
         System.out.println(Utils.convertToLocalTime(appointment.getDate()));
 
-        List<LecturersBookings> lecturersBookings = lecturersBookingsRepository.findByDateAndLecturer(Utils.convertToLocalDate(appointment.getDate()), appointment.getAppointmentWith());
+        UserAccount lecturer = userAccountRepository.getOne(appointment.getAppointmentWith());
 
-        System.out.println(lecturersBookings);
+        UserAccount student = userAccountRepository.getOne(appointment.getAppointmentBy());
 
-//        String spaceStartTime = Utils.convertToLocalTime(appointment.getDate()).toString();
-//        String spaceEndTime = Utils.convertToLocalTime(appointment.getDate()).plusMinutes(appointment.getAnticipatedDuration()).toString();
+        appointment.setIsApproaved(false);
+        appointment.setApprovedDuration(appointment.getAnticipatedDuration());
 
-        if (lecturersBookings.size() > 1) {
-            LecturersBookings lastBookingForThatDay = lecturersBookings.get(lecturersBookings.size() - 1);
+        Appointments appointmentSaved = appointmentRepository.save(appointment);
 
-            long dayOfWeek = Utils.convertToLocalDate(appointment.getDate()).getDayOfWeek().getValue();
+        smtpMailSender.send(lecturer.getEmail(), "Appointment Request From Student", "Hie " + lecturer.getFirstName() + " " + lecturer.getLastName() +
+                " Your student " + student.getFirstName() + " " + student.getLastName() + " is requesting to meet up with you on " + appointment.getDate().toString());
 
-            long timeSlotsId = timeSlotLecturerRepository.findByDayOfWeekAndLecturerId(dayOfWeek, appointment.getAppointmentWith()).get(0).getTimeSlotId();
+        Spaces spaces = new Spaces();
+        spaces.setStartTime(Utils.convertToLocalTime(appointment.getDate()).toString());
+        spaces.setEndTime(Utils.convertToLocalTime(appointment.getDate()).plusMinutes(60).toString());
+        spaces.setLecturerId(appointment.getAppointmentWith());
+        spacesRepository.save(spaces);
 
-            TimeSlots freeTimeSlotForLecturerOnThatDay = timeSlotRepository.getOne(timeSlotsId);
+        LecturersBookings lecturersBooking = new LecturersBookings();
+        lecturersBooking.setTimeslot(evaluateTimeSlotByTime(Utils.convertToLocalTime(appointment.getDate())));
+        lecturersBooking.setApproaved(false);      //still waiting for lecturer's approval
+        lecturersBooking.setAppointment(appointmentSaved);
+        lecturersBooking.setDate(Utils.convertToLocalDate(appointment.getDate()));
+        lecturersBooking.setApprovedDuration(appointment.getAnticipatedDuration());
+        lecturersBooking.setAppointmentWith(appointment.getAppointmentBy());
+        lecturersBooking.setApproavedEndTime(Utils.convertToLocalTime(appointment.getDate()).plusMinutes(appointment.getAnticipatedDuration()));
+        lecturersBooking.setLecturer(appointment.getAppointmentWith());
 
-            LocalTime endTimeOfLastBookingForThatDay = lastBookingForThatDay.getApproavedEndTime();
+        lecturersBookingsRepository.save(lecturersBooking);
+        return appointmentSaved;
 
-            if (endTimeOfLastBookingForThatDay.plusMinutes(appointment.getAnticipatedDuration()).isBefore(freeTimeSlotForLecturerOnThatDay.getEndTime())) {
-
-                appointment.setIsApproaved(false);
-                appointment.setApprovedDuration(appointment.getAnticipatedDuration());
-
-                Appointments appointmentSaved = appointmentRepository.save(appointment);
-
-//                Spaces spaces = new Spaces();
-//                spaces.setStartTime(spaceStartTime);
-//                spaces.setEndTime(spaceEndTime);
-//                spaces.setLecturerId(appointment.getAppointmentWith());
-//                spacesRepository.save(spaces);
-
-                LecturersBookings lecturersBooking = new LecturersBookings();
-                lecturersBooking.setTimeslot(freeTimeSlotForLecturerOnThatDay);
-                lecturersBooking.setApproaved(false);      //still waiting for lecturer's approval
-                lecturersBooking.setAppointment(appointmentSaved);
-                lecturersBooking.setDate(Utils.convertToLocalDate(appointment.getDate()));
-                lecturersBooking.setApprovedDuration(appointment.getAnticipatedDuration());
-                lecturersBooking.setAppointmentWith(appointment.getAppointmentBy());
-                lecturersBooking.setApproavedEndTime(endTimeOfLastBookingForThatDay.plusMinutes(appointment.getAnticipatedDuration()));
-                lecturersBooking.setLecturer(appointment.getAppointmentWith());
-
-                lecturersBookingsRepository.save(lecturersBooking);
-                return appointmentSaved;
-            } else
-                throw new AppointmentBookingFailedException(ValidateAppointmentResponses.Response1.getAppointmentResponse());
-        } else {
-
-            long dayOfWeek = Utils.convertToLocalDate(appointment.getDate()).getDayOfWeek().getValue();
-
-            List<TimeSlotLecturer> timeSlotLecturers = timeSlotLecturerRepository.findByDayOfWeekAndLecturerId(dayOfWeek, appointment.getAppointmentWith());
-
-            if (timeSlotLecturers.size() == 0)
-                throw new AppointmentBookingFailedException(ValidateAppointmentResponses.Response2.getAppointmentResponse());
-
-            else {
-                TimeSlots freeTimeSlotForLecturerOnThatDay = timeSlotRepository.getOne(timeSlotLecturers.get(0).getTimeSlotId());
-
-                System.out.println("xxx");
-
-                System.out.println(freeTimeSlotForLecturerOnThatDay);
-
-                LocalTime time = Utils.convertToLocalTime(appointment.getDate());
-
-                TimeSlots tm = evaluateTimeSlotByTime(Utils.convertToLocalTime(appointment.getDate()));
-
-                System.out.println(evaluateTimeSlotByTime(Utils.convertToLocalTime(appointment.getDate())));
-
-                if (freeTimeSlotForLecturerOnThatDay.getId() == evaluateTimeSlotByTime(Utils.convertToLocalTime(appointment.getDate())).getId()) {
-
-                    appointment.setIsApproaved(false);
-                    appointment.setApprovedDuration(appointment.getAnticipatedDuration());
-
-                    Appointments appointmentSaved = appointmentRepository.save(appointment);
-
-//                    Spaces spaces = new Spaces();
-//                    spaces.setStartTime(spaceStartTime);
-//                    spaces.setEndTime(spaceEndTime);
-//                    spaces.setLecturerId(appointment.getAppointmentWith());
-//                    spacesRepository.save(spaces);
-
-                    LecturersBookings lecturersBooking = new LecturersBookings();
-                    lecturersBooking.setTimeslot(freeTimeSlotForLecturerOnThatDay);
-                    lecturersBooking.setApproaved(false);      //still waiting for lecturer's approval
-                    lecturersBooking.setAppointment(appointmentSaved);
-                    lecturersBooking.setDate(Utils.convertToLocalDate(appointment.getDate()));
-                    lecturersBooking.setApprovedDuration(appointment.getAnticipatedDuration());
-                    lecturersBooking.setAppointmentWith(appointment.getAppointmentBy());
-                    lecturersBooking.setApproavedEndTime(freeTimeSlotForLecturerOnThatDay.getStartTime().plusMinutes(appointment.getAnticipatedDuration()));
-                    lecturersBooking.setLecturer(appointment.getAppointmentWith());
-
-                    lecturersBookingsRepository.save(lecturersBooking);
-                    return appointmentSaved;
-                } else
-                    throw new AppointmentBookingFailedException(ValidateAppointmentResponses.Response3.getAppointmentResponse());
-            }
-
-        }
     }
-
-
-//    Appointments validateAppointmentTheOne(Appointments appointment){
-//        Spaces spaces = new Spaces();
-//        spaces.setStartTime(Utils.convertToLocalDate(appointment.getDate()).toString());
-//        spaces.setEndTime((Utils.convertToLocalDate(appointment.getDate())).plusMinutes(appointment.getAnticipatedDuration()).toString());
-//
-//        Appointments appointmentSaved = appointmentRepository.save(appointment);
-//
-//        LecturersBookings lecturersBooking = new LecturersBookings();
-//        lecturersBooking.setTimeslot(freeTimeSlotForLecturerOnThatDay);
-//        lecturersBooking.setApproaved(false);      //still waiting for lecturer's approval
-//        lecturersBooking.setAppointment(appointmentSaved);
-//        lecturersBooking.setDate(Utils.convertToLocalDate(appointment.getDate()));
-//        lecturersBooking.setApprovedDuration(appointment.getAnticipatedDuration());
-//        lecturersBooking.setAppointmentWith(appointment.getAppointmentBy());
-//        lecturersBooking.setApproavedEndTime(freeTimeSlotForLecturerOnThatDay.getStartTime().plusMinutes(appointment.getAnticipatedDuration()));
-//        lecturersBooking.setLecturer(appointment.getAppointmentWith());
-//
-//        lecturersBookingsRepository.save(lecturersBooking);
-//        return appointmentSaved;
-//    }
 
 
     TimeSlots evaluateTimeSlotByTime(LocalTime time) {
@@ -318,17 +247,17 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
         System.out.println(timeSlotRepository.findAll());
 
-        if (time.isAfter(LocalTime.parse("08:00")) && time.isBefore(LocalTime.parse("10:00"))) {
+        if (time.isAfter(LocalTime.parse("07:59")) && time.isBefore(LocalTime.parse("10:00"))) {
             System.out.println(((List<TimeSlots>) all).get(0));
             TimeSlots t = all.parallelStream().findFirst().get();
             return t;
 //            TimeSlots t = timeSlotRepository.findByStartTime(LocalTime.parse("08:00"));
 //            return timeSlotRepository.findByStartTime(LocalTime.parse("08:00"));
-        } else if (time.isAfter(LocalTime.parse("10:15")) && time.isBefore(LocalTime.parse("12:15")))
+        } else if (time.isAfter(LocalTime.parse("10:14")) && time.isBefore(LocalTime.parse("12:15")))
             //  return timeSlotRepository.findByStartTime(LocalTime.parse("10:15"));
             return timeSlotRepository.findByStartTime(LocalTime.parse("10:15"));
 
-        else if (time.isAfter(LocalTime.parse("13:00")) && time.isBefore(LocalTime.parse("15:00")))
+        else if (time.isAfter(LocalTime.parse("12:59")) && time.isBefore(LocalTime.parse("15:00")))
 //            return timeSlotRepository.findByStartTime(LocalTime.parse("13:00"));
             return timeSlotRepository.findByStartTime(LocalTime.parse("13:00"));
 
