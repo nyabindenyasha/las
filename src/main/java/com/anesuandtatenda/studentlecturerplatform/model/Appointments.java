@@ -24,8 +24,8 @@ public class Appointments implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
 
-    @Column(name = "date_uuid")
-    private String dateUuid;
+//    @Column(name = "date_uuid")
+//    private String dateUuid;
 
     @Column(name = "is_open")
     private boolean isOpen;
@@ -157,14 +157,6 @@ public class Appointments implements Serializable {
 
     public void setApprovedDuration(long approvedDuration) {
         this.approvedDuration = approvedDuration;
-    }
-
-    public String getDateUuid() {
-        return dateUuid;
-    }
-
-    public void setDateUuid(String dateUUID) {
-        this.dateUuid = dateUuid;
     }
 
     public static Appointments fromCommand(Appointments request) {
