@@ -69,7 +69,7 @@ public class SpacesServiceImpl extends BaseServiceImpl<Spaces, Spaces, Spaces> i
     @Override
     public Collection<Spaces> evaluateByLecturerId(long lecturerId, int dayOfWeek) {
 
-        spaces = HourlySegments.getHourlySeg();
+        spaces = HourlySegments.getHourlySeg(lecturerId);
 
         System.out.println(spaces);
 

@@ -15,4 +15,6 @@ public interface AppointmentRepository extends BaseRepository<Appointments> {
 
     boolean existsByDate(Date date);
 
+//    Optional<Appointments> findByDateUuid(long uuid);
+
 }

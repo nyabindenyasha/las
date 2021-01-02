@@ -59,17 +59,23 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
     @Override
     public Appointments create(AppointmentRequest request) {
 
-        boolean detailsExists = appointmentRepository.existsByDate(request.getDate());
+        System.out.println("create");
 
-        if (detailsExists) {
-            throw new InvalidRequestException("Appointment already created");
-        }
+//        val detailsExists = appointmentRepository.findByDateUuid(request.getDate().getTime());
+//
+//        System.out.println("detailsExists: " + detailsExists);
+//
+//        if (detailsExists != null) {
+//            throw new InvalidRequestException("Appointment already created");
+//        }
 
         UserAccount appointmentBy = userAccountRepository.getOne(request.getAppointmentBy());
 
         UserAccount appointmentWith = userAccountRepository.getOne(request.getAppointmentWith());
 
         Appointments appointment = new Appointments();
+
+//        appointment.setDateUuid(Utils.convertToLocalDate(appointment.getDate()).getMonthValue().);
 
         appointment.setAppointmentBy(appointmentBy.getId());
 
@@ -91,23 +97,25 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
     @Override
     public Appointments createFromMobile(AppointmentRequestMobile request) {
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
         LocalDateTime dateTime = LocalDateTime.parse(request.getDateString(), formatter);
 
         request.setDate(Utils.convertToDateViaInstant(dateTime));
 
-        boolean detailsExists = appointmentRepository.existsById(request.getId());
-
-        if (detailsExists) {
-            throw new InvalidRequestException("Appointment with the same name already exists");
-        }
+//        val detailsExists = appointmentRepository.findByDateUuid(request.getDate().getTime());
+//
+//        if (detailsExists != null) {
+//            throw new InvalidRequestException("Appointment with the same name already exists");
+//        }
 
         UserAccount appointmentBy = userAccountRepository.getOne(request.getAppointmentBy());
 
         UserAccount appointmentWith = userAccountRepository.getOne(request.getAppointmentWith());
 
         Appointments appointment = new Appointments();
+
+//        appointment.setDateUuid(appointment.getDate().getTime());
 
         appointment.setAppointmentBy(appointmentBy.getId());
 
