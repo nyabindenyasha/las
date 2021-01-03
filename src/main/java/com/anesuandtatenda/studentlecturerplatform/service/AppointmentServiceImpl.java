@@ -87,6 +87,8 @@ public class AppointmentServiceImpl extends BaseServiceImpl<Appointments, Appoin
 
         appointment.setDate(dateWithHoursSubtracted);
 
+        appointment.setDate(request.getDate());
+
         //    appointment.fromCommand(appointment);
 
         Appointments validateAppointmentBookingResult = validateAppointmentBooking(appointment);
