@@ -1,5 +1,9 @@
 package com.anesuandtatenda.studentlecturerplatform.model;
 
+import com.anesuandtatenda.studentlecturerplatform.local.BeanUtil;
+import com.anesuandtatenda.studentlecturerplatform.service.UserAccountService;
+import lombok.val;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -44,15 +48,13 @@ public class Appointments implements Serializable {
     @Column(name = "approved_duration")
     private long approvedDuration;
 
-//	@JoinColumn(name = "appointment_with", referencedColumnName = "id")
-//	@ManyToOne(optional = false)
-//	private UserAccount appointmentWith;
+    @Transient
+    private UserAccount appointmentWithObj;
 
     private long appointmentWith;
 
-//	@JoinColumn(name = "appointment_by", referencedColumnName = "id")
-//	@ManyToOne(optional = false)
-//	private UserAccount appointmentBy;
+    @Transient
+    private UserAccount appointmentByObj;
 
     private long appointmentBy;
 
@@ -119,24 +121,16 @@ public class Appointments implements Serializable {
         this.anticipatedDuration = anticipatedDuration;
     }
 
-//	public UserAccount getAppointmentWith() {
-//		return appointmentWith;
-//	}
-//
-//	public void setAppointmentWith(UserAccount appointmentWith) {
-//		this.appointmentWith = appointmentWith;
-//	}
-//
-//	public UserAccount getAppointmentBy() {
-//		return appointmentBy;
-//	}
-//
-//	public void setAppointmentBy(UserAccount appointmentBy) {
-//		this.appointmentBy = appointmentBy;
-//	}
-
     public long getAppointmentWith() {
         return appointmentWith;
+    }
+
+    public UserAccount getAppointmentWithObj() {
+        return appointmentWithObj;
+    }
+
+    public UserAccount getAppointmentByObj() {
+        return appointmentByObj;
     }
 
     public void setAppointmentWith(long appointmentWith) {
@@ -158,6 +152,7 @@ public class Appointments implements Serializable {
     public void setApprovedDuration(long approvedDuration) {
         this.approvedDuration = approvedDuration;
     }
+
 
     public static Appointments fromCommand(Appointments request) {
 
@@ -201,5 +196,16 @@ public class Appointments implements Serializable {
                 ", appointmentWith=" + appointmentWith +
                 ", appointmentBy=" + appointmentBy +
                 '}';
+    }
+
+    @PostLoad
+    public void postLoad() {
+        val appointmentWithObj = (this.appointmentWith == 0) ? null : BeanUtil.getBean(UserAccountService.class)
+                .findById(this.appointmentWith);
+        this.appointmentWithObj = appointmentWithObj;
+
+        val appointmentByObj = (this.appointmentBy == 0) ? null : BeanUtil.getBean(UserAccountService.class)
+                .findById(this.appointmentBy);
+        this.appointmentByObj = appointmentByObj;
     }
 }

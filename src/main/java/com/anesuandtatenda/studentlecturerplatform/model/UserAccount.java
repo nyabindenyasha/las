@@ -1,7 +1,10 @@
 package com.anesuandtatenda.studentlecturerplatform.model;
 
+import com.anesuandtatenda.studentlecturerplatform.local.BeanUtil;
 import com.anesuandtatenda.studentlecturerplatform.model.enums.Role;
+import com.anesuandtatenda.studentlecturerplatform.service.ProgramService;
 import com.anesuandtatenda.studentlecturerplatform.web.requests.UserAccountRequest;
+import lombok.val;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -103,12 +106,13 @@ public class UserAccount implements Serializable {
     }
 
 //	public Programs getProgram() {
-//		return program;
+//		return BeanUtil.getBean(ProgramService.class)
+//                .findById(programId);
 //	}
-//
-//	public void setProgram(Programs program) {
-//		this.program = program;
-//	}
+
+    public Programs getProgram() {
+        return program;
+    }
 
     public long getProgramId() {
         return programId;
@@ -182,5 +186,12 @@ public class UserAccount implements Serializable {
                 ", program=" + program +
                 ", role=" + role +
                 '}';
+    }
+
+    @PostLoad
+    public void postLoad() {
+        val programs = (this.programId == 0) ? null : BeanUtil.getBean(ProgramService.class)
+                .findById(this.programId);
+        this.program = programs;
     }
 }
