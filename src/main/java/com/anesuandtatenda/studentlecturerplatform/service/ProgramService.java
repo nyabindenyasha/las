@@ -7,4 +7,8 @@ import com.anesuandtatenda.studentlecturerplatform.model.Programs;
 
 public interface ProgramService extends BaseService<Programs, ProgramCreateRequest, ProgramUpdateRequest> {
 
+    boolean existsByName(String name);
+
+    Programs getByName(String name);
+
 }

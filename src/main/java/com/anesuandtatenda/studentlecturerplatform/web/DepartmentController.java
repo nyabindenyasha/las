@@ -95,7 +95,7 @@ public class DepartmentController {
     public ResponseEntity<?> update(@RequestBody DepartmentUpdateRequest request, @PathVariable long departmentId) {
         try {
             if(request.getId() != departmentId){
-                throw new InvalidRequestException("You can not delete this record as it might be used by another record");
+                throw new InvalidRequestException("Department with specified Id not found");
             }
             Department departmentUpdated = departmentService.update(request);
             return new ResponseEntity<Department>(departmentUpdated, HttpStatus.OK);

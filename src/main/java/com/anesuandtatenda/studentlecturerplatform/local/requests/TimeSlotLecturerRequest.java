@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class TimeSlotLecturerRequest {
 
-    private int dayOfWeek;
+    private long dayOfWeek;
 
     private long lecturerId;
 

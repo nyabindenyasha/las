@@ -9,7 +9,6 @@ import com.anesuandtatenda.studentlecturerplatform.model.Programs;
 import com.anesuandtatenda.studentlecturerplatform.repo.DepartmentRepository;
 import com.anesuandtatenda.studentlecturerplatform.repo.FacaultyRepository;
 import com.anesuandtatenda.studentlecturerplatform.repo.ProgramRepository;
-import lombok.val;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +45,7 @@ class ProgramServiceImpl extends BaseServiceImpl<Programs, ProgramCreateRequest,
         }
 
         Optional<Department> department = departmentRepository.findById(request.getDepartmentId());
-        Programs program=Programs.fromCommand(request);
+        Programs program = Programs.fromCommand(request);
         program.setDepartment(department.get());
         return programRepository.save(program);
     }
@@ -83,5 +82,15 @@ class ProgramServiceImpl extends BaseServiceImpl<Programs, ProgramCreateRequest,
         } catch (ConstraintViolationException var3) {
             throw new InvalidRequestException("You can not delete this record is might be used by another record");
         }
+    }
+
+    @Override
+    public boolean existsByName(String name) {
+        return programRepository.existsByName(name);
+    }
+
+    @Override
+    public Programs getByName(String name) {
+        return programRepository.getByName(name);
     }
 }

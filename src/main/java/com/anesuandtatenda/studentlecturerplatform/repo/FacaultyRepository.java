@@ -7,4 +7,5 @@ public interface FacaultyRepository extends BaseRepository<Facaulty> {
 
     boolean existsByName(String name);
 
+    Facaulty getByName(String name);
 }

@@ -3,7 +3,6 @@ package com.anesuandtatenda.studentlecturerplatform.service;
 import com.anesuandtatenda.studentlecturerplatform.local.exceptions.InvalidRequestException;
 import com.anesuandtatenda.studentlecturerplatform.model.Facaulty;
 import com.anesuandtatenda.studentlecturerplatform.repo.FacaultyRepository;
-import lombok.val;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolationException;
@@ -41,12 +40,6 @@ class FacaultyServiceImpl extends BaseServiceImpl<Facaulty, Facaulty, Facaulty> 
     @Override
     public Facaulty update(Facaulty request) {
 
-        boolean detailsExists = facaultyRepository.existsByName(request.getName());
-
-        if (!detailsExists) {
-            throw new InvalidRequestException("Facaulty not found");
-        }
-
         Facaulty facaulty = findById(request.getId());
 
         facaulty.update(request);
@@ -61,5 +54,15 @@ class FacaultyServiceImpl extends BaseServiceImpl<Facaulty, Facaulty, Facaulty> 
         } catch (ConstraintViolationException var3) {
             throw new InvalidRequestException("You can not delete this record is might be used by another record");
         }
+    }
+
+    @Override
+    public boolean existsByName(String name) {
+        return facaultyRepository.existsByName(name);
+    }
+
+    @Override
+    public Facaulty getByName(String name) {
+        return facaultyRepository.getByName(name);
     }
 }

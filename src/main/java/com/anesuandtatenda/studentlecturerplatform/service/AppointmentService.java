@@ -7,6 +7,7 @@ import com.anesuandtatenda.studentlecturerplatform.local.requests.ApproveAppoint
 import com.anesuandtatenda.studentlecturerplatform.model.Appointments;
 
 import java.util.Collection;
+import java.util.Date;
 
 public interface AppointmentService extends BaseService<Appointments, AppointmentRequest, AppointmentRequest> {
 
@@ -17,5 +18,7 @@ public interface AppointmentService extends BaseService<Appointments, Appointmen
     Collection<Appointments> findByAppointmentWithId(long id);
 
     Collection<Appointments> findByAppointmentById(long id);
+
+    boolean existsByDate(Date date);
 
 }
