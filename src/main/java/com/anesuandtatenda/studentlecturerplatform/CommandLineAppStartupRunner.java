@@ -103,30 +103,30 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
             programService.create(program);
         }
 
-        boolean adminExists = userAccountService.existByRegNumber("AD1234M");
+        boolean adminExists = userAccountService.existByRegNumber("C1512633D");
 
         if (!adminExists) {
             UserAccountRequest adminAccountRequest = new UserAccountRequest();
             adminAccountRequest.setFirstName("Anesu");
             adminAccountRequest.setLastName("Mufushwa");
             adminAccountRequest.setPassword("admin");
-            adminAccountRequest.setRegNumber("AD1234M");
-            adminAccountRequest.setEmail("");
+            adminAccountRequest.setRegNumber("C1512633D");
+            adminAccountRequest.setEmail("nyabindenyashae@gmail.com");
             adminAccountRequest.setProgramId(0);
             adminAccountRequest.setRole(Role.ADMIN);
             adminAccountRequest.setYear(0);
             userAccountService.create(adminAccountRequest);
         }
 
-        boolean lecturerExists = userAccountService.existByRegNumber("LE1234R");
+        boolean lecturerExists = userAccountService.existByRegNumber("LECT");
 
         if (!lecturerExists) {
             UserAccountRequest lecturerAccountRequest = new UserAccountRequest();
             lecturerAccountRequest.setFirstName("Mercy");
             lecturerAccountRequest.setLastName("Chinyuku");
             lecturerAccountRequest.setPassword("lecturer");
-            lecturerAccountRequest.setRegNumber("LE1234R");
-            lecturerAccountRequest.setEmail("nyabindenyasha@gmail.com");
+            lecturerAccountRequest.setRegNumber("LECT");
+            lecturerAccountRequest.setEmail("anesuhonestmufushwa@gmail.com");
             Programs program = programService.getByName("QWAB");
             lecturerAccountRequest.setProgramId(program.getId());
             lecturerAccountRequest.setRole(Role.LECTURER);
@@ -134,15 +134,15 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
             userAccountService.create(lecturerAccountRequest);
         }
 
-        boolean studentExists = userAccountService.existByRegNumber("ST1234T");
+        boolean studentExists = userAccountService.existByRegNumber("C16129447T");
 
         if (!studentExists) {
             UserAccountRequest studentAccountRequest = new UserAccountRequest();
             studentAccountRequest.setFirstName("Tatenda");
             studentAccountRequest.setLastName("Nderema");
             studentAccountRequest.setPassword("student");
-            studentAccountRequest.setRegNumber("ST1234T");
-            studentAccountRequest.setEmail("nyabindenyashae@gmail.com");
+            studentAccountRequest.setRegNumber("C16129447T");
+            studentAccountRequest.setEmail("munashegandira@gmail.com");
             Programs program = programService.getByName("QWAB");
             studentAccountRequest.setProgramId(program.getId());
             studentAccountRequest.setRole(Role.STUDENT);

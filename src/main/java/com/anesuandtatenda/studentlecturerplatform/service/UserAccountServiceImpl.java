@@ -1,5 +1,6 @@
 package com.anesuandtatenda.studentlecturerplatform.service;
 
+import com.anesuandtatenda.studentlecturerplatform.local.SmtpMailSender;
 import com.anesuandtatenda.studentlecturerplatform.local.exceptions.InvalidRequestException;
 import com.anesuandtatenda.studentlecturerplatform.model.UserAccount;
 import com.anesuandtatenda.studentlecturerplatform.model.enums.Role;
@@ -7,8 +8,10 @@ import com.anesuandtatenda.studentlecturerplatform.repo.ProgramRepository;
 import com.anesuandtatenda.studentlecturerplatform.repo.UserAccountRepository;
 import com.anesuandtatenda.studentlecturerplatform.web.requests.LoginRequest;
 import com.anesuandtatenda.studentlecturerplatform.web.requests.UserAccountRequest;
+import lombok.SneakyThrows;
 import lombok.val;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -21,6 +24,8 @@ class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, UserAccountReq
     private final UserAccountRepository userAccountRepository;
     private final ProgramRepository programRepository;
 
+    @Autowired
+    private SmtpMailSender smtpMailSender;
 
     UserAccountServiceImpl(UserAccountRepository userAccountRepository, ProgramRepository programRepository) {
         super(userAccountRepository);
@@ -33,6 +38,7 @@ class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, UserAccountReq
         return UserAccount.class;
     }
 
+    @SneakyThrows
     @Override
     public UserAccount create(UserAccountRequest request) {
 
@@ -49,6 +55,9 @@ class UserAccountServiceImpl extends BaseServiceImpl<UserAccount, UserAccountReq
         if (detailsExist) {
             throw new InvalidRequestException("UserAccount already exist.");
         }
+
+        smtpMailSender.send(request.getEmail(), "User Created", "Hie " + request.getFirstName() + " " + request.getLastName() +
+                "\n You have been added to the Lecturer Appointment System. Welcome to the family");
 
         return userAccountRepository.save(userAccount);
     }
